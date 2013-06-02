@@ -1,0 +1,121 @@
+#
+# Copyright John Reid 2013
+#
+
+#
+# project STEME
+#
+
+import path ;
+import doxygen ;
+import pch ;
+import python ;
+
+#
+# Some paths
+#
+path-constant PROJECT_DIR           : . ;
+path-constant DOC_DIR               : ../docs/c++ ;
+path-constant RELEASE_INSTALL_DIR   : ../python/seqan/_release_build ;
+path-constant DEBUG_INSTALL_DIR     : ../python/seqan/_debug_build ;
+
+
+
+#
+# Project definition
+#
+project pyseqan
+	: requirements
+		<use>/site-config//seqan
+		# <use>/site-config//numpy
+		<define>MS_HAS_VALGRIND
+		<source>myrrh//myrrh
+		# <source>hmm//hmm
+		# <toolset>gcc:<cxxflags>-H # for seeing which files are included where : http://gamesfromwithin.com/the-care-and-feeding-of-pre-compiled-headers
+		<toolset>gcc:<cxxflags>-Wno-deprecated
+        <toolset>gcc:<cxxflags>-Wno-unused
+        <toolset>gcc:<cxxflags>-std=c++0x
+        # <toolset>gcc:<cxxflags>-MM # don't output object, write a list of include files
+		# <toolset>gcc:<cxxflags>-fno-inline # <<<<<<<<<<<<<<<<<<<<<< Don't forget to remove this !!!!!!!!!!!!!!
+		# <link>static
+		<include>.
+		<include>include
+		<include>$(BOOST_ROOT)
+		<include>$(BOOST_INDEXING_SUITE)
+		<variant>release:<define>MYRRH_DISABLE_ASSERTS # <<<<<<<<<<<<<<<<<<<<<< Don't forget to remove this !!!!!!!!!!!!!!
+		<variant>debug:<python-debugging>on
+		#<variant>debug:<python>2.7
+	: usage-requirements
+	: default-build release
+	;
+
+
+
+
+
+
+cpp-pch pyseqan_pch
+    : pyseqan_pch.h
+    : <use>/boost/python//boost_python/
+    ;
+
+local PY_EXT_REQS = 
+	<variant>release:<linkflags>-Wl,-rpath,$(RELEASE_INSTALL_DIR)
+	<variant>debug:<linkflags>-Wl,-rpath,$(DEBUG_INSTALL_DIR)
+    <target-os>linux:<source>/site-config//rt
+	;
+
+local INDEX_SRCS =
+    module_pyseqan
+    python_seqan
+    ;
+    
+python-extension _seqan
+	: # sources	
+		src/$(INDEX_SRCS).cpp
+		$(PY_EXT_SOURCES)
+		pyseqan_pch
+	:
+		$(PY_EXT_REQS)
+    ;
+    
+#
+# Python tests
+#
+local PY_TEST_FILES = [ glob ../python/seqan/test/test_*.py ] ;
+local PY_TESTS = $(PY_TEST_FILES:B) ;
+for PY_TEST in $(PY_TESTS) {
+	# create boost python test 
+	local target = py_$(PY_TEST) ;
+	bpl-test $(target) : ../python/seqan/test/$(PY_TEST).py _seqan install ;
+	explicit $(target) ;
+}
+# alias for all tests
+alias all_pytests : py_$(PY_TESTS) ;
+#explicit all_pytests ;
+
+
+#
+# All tests
+#
+alias all_tests : all_pytests ;
+
+
+#
+# Installation
+#
+install install
+    :
+        _seqan 
+        /boost/python//boost_python
+    :
+        <variant>release:<location>$(RELEASE_INSTALL_DIR)
+        <variant>debug:<location>$(DEBUG_INSTALL_DIR)
+        # <install-dependencies>off
+    ;
+    
+
+python-extension test_registry_ext : src/module_test_registry.cpp ;
+#explicit test_registry ;
+bpl-test test_registry : bpl-tests/test_registry.py test_registry_ext ;
+

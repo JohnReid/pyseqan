@@ -1,0 +1,7 @@
+path-constant TOP : . ;
+
+if ! "$(BOOST_ROOT)" {
+  path-constant BOOST_ROOT : [ modules.peek : BOOST_ROOT ] ;
+}
+
+use-project /boost : $(BOOST_ROOT) ;
