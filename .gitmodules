@@ -1,0 +1,3 @@
+[submodule "c++/myrrh"]
+	path = c++/myrrh
+	url = git@github.com:JohnReid/myrrh.git
