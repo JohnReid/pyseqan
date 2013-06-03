@@ -121,6 +121,58 @@ struct index_exposer {
     }
 
 
+    struct top_down_exposer
+    : myrrh::python::expose_or_set_attribute< top_down_exposer >
+    {
+    	typedef typename Iterator< exposed_t, TopDown<> >::Type exposed_type;
+
+    	void
+    	expose( const char * name ) {
+    		topdown_iterator_exposer< exposed_type >::expose( name );
+    	}
+    };
+
+
+    struct infix_exposer
+    : myrrh::python::expose_or_set_attribute< infix_exposer >
+    {
+    	typedef infix_t exposed_type;
+
+    	void
+    	expose( const char * name ) {
+            namespace py = boost::python;
+    		py::class_<
+    			infix_t
+    		> infix_class(
+    			name,
+    			"Infix of string."
+    		);
+			const_container_exposer< infix_t >::expose( infix_class );
+			infix_class.def( "__str__", std_string_from_seqan< infix_t >, "String representation." );
+    	}
+    };
+
+
+    struct vertex_exposer
+    : myrrh::python::expose_or_set_attribute< vertex_exposer >
+    {
+    	typedef vertex_t exposed_type;
+
+    	void
+    	expose( const char * name ) {
+            namespace py = boost::python;
+			py::class_< exposed_type > vertex_class(
+				name,
+				"A vertex in an index.",
+				py::no_init
+			);
+			vertex_class.add_property( "id", id, "The id of this vertex. Can be used as an index into a property map." );
+			vertex_class.def( "__eq__", _vertex_eq, "Tests equality." );
+			vertex_class.def( "__hash__", id, "Hash function." );
+    	}
+    };
+
+
     static
     void
     expose() {
@@ -138,35 +190,10 @@ struct index_exposer {
         _class.def( "visit", visit_tree, "Visit all the nodes in a tree. This can be useful to build the suffix tree ahead of doing any timings." );
         _class.def( "__len__", __len__, "The length of the index." );
 
-        {
-            py::scope scope( _class );
-
-            topdown_iterator_exposer< typename Iterator< exposed_t, TopDown<> >::Type >::expose();
-
-            py::class_<
-                infix_t
-            > infix_class(
-                "Infix",
-                "Infix of string."
-            );
-            const_container_exposer< infix_t >::expose( infix_class );
-            infix_class.def( "__str__", std_string_from_seqan< infix_t >, "String representation." );
-
-            // The class to represent a vertex: check if already registered
-            auto registration = myrrh::python::get_registration< vertex_t >();
-            if( registration ) {
-            	scope.attr( "Vertex" ) = py::handle<>( registration->m_class_object );
-            } else {
-				py::class_< vertex_t > vertex_class(
-					"Vertex",
-					"A vertex in an index.",
-					py::no_init
-				);
-				vertex_class.add_property( "id", id, "The id of this vertex. Can be used as an index into a property map." );
-				vertex_class.def( "__eq__", _vertex_eq, "Tests equality." );
-				vertex_class.def( "__hash__", id, "Hash function." );
-            }
-        }
+		py::scope scope( _class );
+		top_down_exposer()( scope, "TopDownIterator" );
+		infix_exposer()( scope, "Infix" );
+		vertex_exposer()( scope, "Vertex" );
     }
 };
 

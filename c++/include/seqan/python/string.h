@@ -22,6 +22,22 @@ namespace python {
 
 
 
+template< typename infix_t >
+void
+expose_infix() {
+    namespace py = boost::python;
+
+    py::class_<
+		infix_t
+	> infix_class(
+		"Infix",
+		"Infix of string."
+	);
+	const_container_exposer< infix_t >::expose( infix_class );
+	infix_class.def( "__str__", std_string_from_seqan< infix_t >, "String representation." );
+}
+
+
 /**
  * String exposer.
  */
@@ -98,14 +114,16 @@ struct string_exposer
         _class.def( "infix", _infix, "Infix of the string.", py::with_custodian_and_ward_postcall< 0, 1 >() );
 
         py::scope scope( _class );
-        py::class_<
-            infix_t
-        > infix_class(
-            "Infix",
-            "Infix of string."
-        );
-        const_container_exposer< infix_t >::expose( infix_class );
-        infix_class.def( "__str__", std_string_from_seqan< infix_t >, "String representation." );
+
+        // the class to represent an infix
+        {
+			auto registration = myrrh::python::get_registration< infix_t >();
+			if( registration ) {
+				scope.attr( "Infix" ) = py::handle<>( registration->m_class_object );
+			} else {
+				expose_infix< infix_t >();
+			}
+        }
     }
 };
 

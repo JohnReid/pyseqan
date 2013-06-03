@@ -108,7 +108,7 @@ struct topdown_iterator_exposer {
 
     static
     void
-    expose() {
+    expose( const char * name = "TopDownIterator" ) {
         namespace py = boost::python;
 
         py::class_<
