@@ -2,10 +2,6 @@
 # Copyright John Reid 2013
 #
 
-#
-# project STEME
-#
-
 import path ;
 import doxygen ;
 import pch ;
@@ -26,15 +22,15 @@ path-constant DEBUG_INSTALL_DIR     : ../python/seqan/_debug_build ;
 #
 project pyseqan
 	: requirements
+		<library>/boost/python//boost_python
+		<library>myrrh//myrrh
 		<use>/site-config//seqan
 		# <use>/site-config//numpy
 		<define>MS_HAS_VALGRIND
-		<source>myrrh//myrrh
-		# <source>hmm//hmm
-		# <toolset>gcc:<cxxflags>-H # for seeing which files are included where : http://gamesfromwithin.com/the-care-and-feeding-of-pre-compiled-headers
 		<toolset>gcc:<cxxflags>-Wno-deprecated
         <toolset>gcc:<cxxflags>-Wno-unused
         <toolset>gcc:<cxxflags>-std=c++0x
+		# <toolset>gcc:<cxxflags>-H # for seeing which files are included where : http://gamesfromwithin.com/the-care-and-feeding-of-pre-compiled-headers
         # <toolset>gcc:<cxxflags>-MM # don't output object, write a list of include files
 		# <toolset>gcc:<cxxflags>-fno-inline # <<<<<<<<<<<<<<<<<<<<<< Don't forget to remove this !!!!!!!!!!!!!!
 		# <link>static
@@ -42,43 +38,38 @@ project pyseqan
 		<include>include
 		<include>$(BOOST_ROOT)
 		<include>$(BOOST_INDEXING_SUITE)
-		<variant>release:<define>MYRRH_DISABLE_ASSERTS # <<<<<<<<<<<<<<<<<<<<<< Don't forget to remove this !!!!!!!!!!!!!!
-		<variant>debug:<python-debugging>on
-		#<variant>debug:<python>2.7
+		<variant>release:<define>MYRRH_DISABLE_ASSERTS
+		#<variant>debug:<python-debugging>on
 	: usage-requirements
 	: default-build release
 	;
 
 
 
-
-
-
+#
+# Pre-compiled header
+#
 cpp-pch pyseqan_pch
     : pyseqan_pch.h
-    : <use>/boost/python//boost_python/
     ;
 
-local PY_EXT_REQS = 
-	<variant>release:<linkflags>-Wl,-rpath,$(RELEASE_INSTALL_DIR)
-	<variant>debug:<linkflags>-Wl,-rpath,$(DEBUG_INSTALL_DIR)
-    <target-os>linux:<source>/site-config//rt
-	;
 
-local INDEX_SRCS =
-    module_pyseqan
-    python_seqan
-    ;
-    
+#
+# SeqAn extension
+#
 python-extension _seqan
 	: # sources	
-		src/$(INDEX_SRCS).cpp
+		src/module_pyseqan.cpp
+		src/python_seqan.cpp
 		$(PY_EXT_SOURCES)
 		pyseqan_pch
 	:
-		$(PY_EXT_REQS)
+		<variant>release:<linkflags>-Wl,-rpath,$(RELEASE_INSTALL_DIR)
+		<variant>debug:<linkflags>-Wl,-rpath,$(DEBUG_INSTALL_DIR)
+	    <target-os>linux:<source>/site-config//rt
     ;
-    
+
+
 #
 # Python tests
 #
@@ -113,9 +104,19 @@ install install
         <variant>debug:<location>$(DEBUG_INSTALL_DIR)
         # <install-dependencies>off
     ;
-    
+
+
+# A little "rule" (function) to clean up the syntax of declaring tests
+# of these extension modules.
+local rule run-test ( test-name : sources + )
+{
+    import testing ;
+    testing.make-test run-pyd : $(sources) : : $(test-name) ;
+}
+
 
 python-extension test_registry_ext : src/module_test_registry.cpp ;
 #explicit test_registry ;
-bpl-test test_registry : bpl-tests/test_registry.py test_registry_ext ;
+run-test test_registry : bpl-tests/test_registry.py test_registry_ext ;
+#bpl-test test_registry : bpl-tests/test_registry.py test_registry_ext ;
 

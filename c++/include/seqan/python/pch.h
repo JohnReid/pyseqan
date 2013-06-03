@@ -35,6 +35,7 @@
 #include <seqan/find.h>
 #include <myrrh/defs.h>
 #include <myrrh/python/boost_function.h>
+#include <myrrh/python/registry.h>
 #include <myrrh/seqan_boost_range_adaptors.h>
 
 #endif //PYSEQAN_PCH_JR_2JUN2013_DEFS_H_

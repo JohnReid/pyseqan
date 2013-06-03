@@ -1,0 +1,21 @@
+import python ;
+use-project boost : $(BOOST_ROOT) ;
+
+project : requirements <library>/boost/python//boost_python ;
+
+python-extension inner_classes : inner-classes.cpp ;
+
+install install
+  : inner_classes 
+  : <install-dependencies>on <install-type>SHARED_LIB <install-type>PYTHON_EXTENSION 
+    <location>. 
+  ;
+
+local rule run-test ( test-name : sources + )
+{
+    import testing ;
+    testing.make-test run-pyd : $(sources) : : $(test-name) ;
+}
+run-test test : inner_classes test_inner_classes.py ;
+
+

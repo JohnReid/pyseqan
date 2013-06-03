@@ -20,18 +20,6 @@ namespace python {
 
 
 /**
- * Queries if the the type specified is in the registry.
- */
-template< typename QueryT >
-bool
-in_registry() {
-	namespace bp = boost::python;
-	const bp::type_info info = boost::python::type_id< QueryT >();
-	const bp::converter::registration * registration = boost::python::converter::registry::query( info );
-	return registration != 0;
-}
-
-/**
  * Meta-function to produce correct name for an index specialisation.
  */
 template< typename TSpec >
@@ -164,9 +152,11 @@ struct index_exposer {
             const_container_exposer< infix_t >::expose( infix_class );
             infix_class.def( "__str__", std_string_from_seqan< infix_t >, "String representation." );
 
-            // The class to represent a vertex
-            if( ! in_registry< vertex_t >() ) {
-            	std::cout << "Registering\n";
+            // The class to represent a vertex: check if already registered
+            auto registration = myrrh::python::get_registration< vertex_t >();
+            if( registration ) {
+            	scope.attr( "Vertex" ) = py::handle<>( registration->m_class_object );
+            } else {
 				py::class_< vertex_t > vertex_class(
 					"Vertex",
 					"A vertex in an index.",
