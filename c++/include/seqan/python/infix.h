@@ -1,7 +1,7 @@
 /** Copyright John Reid 2013
  *
  * \file
- * \brief Code to expose iterators.
+ * \brief Code to expose infixes.
  *
  */
 
