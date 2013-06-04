@@ -1,0 +1,10 @@
+#!/bin/bash -e
+
+ARGS="--leak-check=full --error-limit=no --gen-suppressions=all"
+VALGRIND="valgrind $ARGS"
+export PYSEQANDEBUG=1
+
+# Create suppressions file for general python seqan suppressions
+$VALGRIND --log-file=tmp.log "$@" >tmp.out
+cat tmp.log | ./parse-valgrind-suppressions
+
