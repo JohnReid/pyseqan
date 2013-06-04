@@ -7,7 +7,6 @@ Test string functionality.
 """
 
 from . import fasta_file
-
 import logging, seqan
 
 def test_strings():
@@ -65,3 +64,17 @@ def test_strings():
     assert 'N' != s5[1]
     print 'A' == s5[1]
     assert 'A' == s5[1]
+
+
+def test_string_set():
+    stringset = seqan.StringDna5Set()
+    stringset.appendValue(seqan.StringDna5('ACGTACGTACGTNNN'))
+    i = iter(stringset)
+    try:
+        while True:
+            logging.info(i.next())
+            logging.info(len(i.next()))
+    except StopIteration:
+        pass
+    map(len, stringset)
+    

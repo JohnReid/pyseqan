@@ -18,6 +18,11 @@ namespace seqan {
 namespace python {
 
 
+inline
+void index_error() {
+	PyErr_SetString( PyExc_IndexError, "Index out of range" );
+}
+
 
 /**
  * Const container exposer.
@@ -42,7 +47,7 @@ struct const_container_exposer {
         _class.def( "__nonzero__", __nonzero__, "Is the container not empty?" );
         _class.def( "__len__", __len__, "The length of the container." );
         _class.def( "value", _value, "Value at the position.", py::return_internal_reference<>() );
-        _class.def( "__getitem__", _value, "Value at the position.", py::return_internal_reference<>() );
+        _class.def( "__getitem__", __getitem__, "Value at the position.", py::return_internal_reference<>() );
     }
 
     static
@@ -67,6 +72,17 @@ struct const_container_exposer {
     reference_t
     _value( exposed_t & _self, position_t pos ) {
         return value( _self, pos );
+    }
+
+    static
+    reference_t
+    __getitem__( exposed_t & _self, position_t pos ) {
+    	if( pos >= length( _self ) ) {
+    		index_error();
+    		throw boost::python::error_already_set();
+    	} else {
+    		return value( _self, pos );
+    	}
     }
 
 };

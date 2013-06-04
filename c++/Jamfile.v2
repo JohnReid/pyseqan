@@ -73,23 +73,23 @@ python-extension _seqan
 #
 # Python tests
 #
-local PY_TEST_FILES = [ glob ../python/seqan/test/test_*.py ] ;
-local PY_TESTS = $(PY_TEST_FILES:B) ;
-for PY_TEST in $(PY_TESTS) {
-	# create boost python test 
-	local target = py_$(PY_TEST) ;
-	bpl-test $(target) : ../python/seqan/test/$(PY_TEST).py _seqan install ;
-	explicit $(target) ;
-}
+#local PY_TEST_FILES = [ glob ../python/seqan/test/test_*.py ] ;
+#local PY_TESTS = $(PY_TEST_FILES:B) ;
+#for PY_TEST in $(PY_TESTS) {
+#	# create boost python test 
+#	local target = py_$(PY_TEST) ;
+#	bpl-test $(target) : ../python/seqan/test/$(PY_TEST).py _seqan install ;
+#	explicit $(target) ;
+#}
 # alias for all tests
-alias all_pytests : py_$(PY_TESTS) ;
+#alias all_pytests : py_$(PY_TESTS) ;
 #explicit all_pytests ;
 
 
 #
 # All tests
 #
-alias all_tests : all_pytests ;
+#alias all_tests : all_pytests ;
 
 
 #

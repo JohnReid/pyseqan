@@ -14,4 +14,9 @@ def test_read_fasta():
     logging.info('Reading %s', filename)
     num_bases, sequences, ids = seqan.readFastaDna5(filename)
     logging.info('Read %d bases in %d sequences', num_bases, len(sequences))
-    logging.info('IDs: %s', ', '.join(ids))
+    assert 4 == len(sequences), len(sequences) 
+    for _id, seq in zip(ids, sequences):
+        assert 1500 == len(seq)
+        logging.info('%5d bases in %s', len(seq), _id)
+    map(len, sequences)
+    

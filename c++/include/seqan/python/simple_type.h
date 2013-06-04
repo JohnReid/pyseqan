@@ -78,18 +78,32 @@ simple_type_name() {
 template< typename Exposed >
 struct simple_type_exposer {
 
+	static
+	Exposed
+	_construct( char c ) {
+		return Exposed( c );
+	}
+
     static
     void
     expose() {
         namespace py = boost::python;
 
-        py::class_< Exposed >
-        _class(
+        py::class_< Exposed > _class(
             simple_type_name< Exposed >(),
-            "Wrapper for SeqAn C++ alphabet."
+            "Wrapper for SeqAn C++ alphabet.",
+            py::init< char >()
         );
+        _class.def( "__init__", py::make_constructor( make_from_string ) );
         _class.def( "__str__", __str__, "A string representation of this simple type." );
-        _class.def( "__eq__", __eq__, "Equality." );
+
+		_class.def( py::self == py::self );
+		_class.def( py::self != py::self );
+		_class.def( py::self <= py::self );
+		_class.def( py::self >= py::self );
+		_class.def( py::self <  py::self );
+		_class.def( py::self >  py::self );
+
         _class.def( "__hash__", __hash__, "Hash value." );
         _class.add_static_property( "valueSize", _valueSize );
 
@@ -98,9 +112,12 @@ struct simple_type_exposer {
     }
 
     static
-    bool
-    __eq__( Exposed const & _self, Exposed const & other ) {
-        return isEqual( other, _self );
+    Exposed *
+    make_from_string( std::string const & s ) {
+    	if( 1 != s.size() ) {
+    		throw std::invalid_argument( "Can only make a simple type from strings of length one." );
+    	}
+        return new Exposed( s[ 0 ] );
     }
 
     static

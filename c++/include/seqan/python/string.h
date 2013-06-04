@@ -163,7 +163,7 @@ struct string_set_exposer
 /**
  * Read a FASTA file into a string set.
  */
-template< typename TString, typename TSpec >
+template< bool Reverse, typename TString, typename TSpec >
 size_t
 read_fasta_(
     const char * fasta_filename,
@@ -187,7 +187,11 @@ read_fasta_(
             std::string tmp_meta;
             assign( tmp_meta, meta );
             ids.push_back( tmp_meta );
-            appendValue( sequences, str );
+            if( Reverse ) {
+            	appendValue( sequences, seqan::ModifiedString< TString, seqan::ModReverse >( str ) );
+            } else {
+            	appendValue( sequences, str );
+            }
         }
         //std::cout << "Read " << length( sequences ) << " sequences with a total of " << num_bases << " bases\n";
         f.close();
@@ -202,10 +206,14 @@ read_fasta_(
  */
 template< typename TStringSet >
 boost::python::tuple
-read_fasta( const char * fasta_filename ) {
+read_fasta( const char * fasta_filename, bool reverse ) {
     boost::shared_ptr< string_vector > ids( new string_vector );
     boost::shared_ptr< TStringSet > sequences( new TStringSet );
-    const size_t num_bases = read_fasta_( fasta_filename, *sequences, *ids );
+    const size_t num_bases =
+		reverse
+			? read_fasta_< true  >( fasta_filename, *sequences, *ids )
+			: read_fasta_< false >( fasta_filename, *sequences, *ids )
+		    ;
     return boost::python::make_tuple( num_bases, sequences, ids );
 }
 
@@ -236,6 +244,7 @@ expose_string_functionality()
     boost::python::def(
         MYRRH_MAKE_STRING( "readFasta" << simple_type_name< TValue >() ).c_str(),
         read_fasta< string_set_t >,
+        ( py::arg( "fasta_filename" ), py::arg( "reverse" )=false ),
         "Read a FASTA file into a seqan string set."
     );
 }
