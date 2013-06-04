@@ -7,9 +7,10 @@ Test assigning iterator functionality.
 """
 
 from . import fasta_file
-import seqan, logging
+import seqan, logging, sys
 
 def test_iterator():
+    logging.info(sys._getframe().f_code.co_name)
     _num_bases, sequences, _ids = seqan.readFastaDna5(fasta_file('dm01r.fasta'))
     logging.info('Building index')
     index = seqan.IndexEsaDna5(sequences)
@@ -18,10 +19,17 @@ def test_iterator():
     assert not i.representative
     assert i.representative.empty()
     
-    for c in 'ACTC':
-        i.goDownChar(c)
-        logging.info(i.representative)
+    i.goDownChar('A')
+    assert 'A' == i.representative, i.representative.Value
+    i.goDownChar('C')
+    assert 'AC' == i.representative
+    i.goDownChar('T')
+    assert 'ACT' == i.representative
+    i.goDownChar('C')
+    assert 'ACTC' == i.representative
+    logging.info(i.representative)
     
+    # check memory handling
     r = i.representative
     print r
     del i

@@ -76,7 +76,10 @@ simple_type_name() {
  * Simple type exposer.
  */
 template< typename Exposed >
-struct simple_type_exposer {
+struct simple_type_exposer
+: myrrh::python::expose_or_set_attribute< simple_type_exposer< Exposed > >
+{
+	typedef Exposed exposed_type;
 
 	static
 	Exposed
@@ -86,11 +89,11 @@ struct simple_type_exposer {
 
     static
     void
-    expose() {
+    expose( const char * name = 0 ) {
         namespace py = boost::python;
 
         py::class_< Exposed > _class(
-            simple_type_name< Exposed >(),
+            name ? name : simple_type_name< Exposed >(),
             "Wrapper for SeqAn C++ alphabet.",
             py::init< char >()
         );
@@ -104,8 +107,9 @@ struct simple_type_exposer {
 		_class.def( py::self <  py::self );
 		_class.def( py::self >  py::self );
 
-        _class.def( "__hash__", __hash__, "Hash value." );
+        _class.def( "__hash__", _ordValue, "Hash value." );
         _class.add_static_property( "valueSize", _valueSize );
+        _class.add_property( "ordValue", _ordValue, "An unsigned value between 0 and valueSize." );
 
         py::implicitly_convertible< Exposed, char >();
         py::implicitly_convertible< char, Exposed >();
@@ -122,7 +126,7 @@ struct simple_type_exposer {
 
     static
     size_t
-    __hash__( Exposed const & _self ) {
+    _ordValue( Exposed const & _self ) {
         return ordValue( _self );
     }
 

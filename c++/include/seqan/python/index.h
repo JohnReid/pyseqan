@@ -10,6 +10,8 @@
 
 #include <seqan/python/defs.h>
 #include <seqan/python/iterator.h>
+#include <seqan/python/infix.h>
+
 #include <seqan/index.h>
 
 
@@ -66,7 +68,6 @@ struct index_exposer {
     typedef Index< TText, TSpec > exposed_t;
     typedef typename Value< TText >::Type string_t;
     typedef typename Value< string_t >::Type alphabet_t;
-    typedef typename Infix< TText const>::Type infix_t;
     typedef typename VertexDescriptor< exposed_t >::Type vertex_t;
 
 
@@ -133,26 +134,6 @@ struct index_exposer {
     };
 
 
-    struct infix_exposer
-    : myrrh::python::expose_or_set_attribute< infix_exposer >
-    {
-    	typedef infix_t exposed_type;
-
-    	void
-    	expose( const char * name ) {
-            namespace py = boost::python;
-    		py::class_<
-    			infix_t
-    		> infix_class(
-    			name,
-    			"Infix of string."
-    		);
-			const_container_exposer< infix_t >::expose( infix_class );
-			infix_class.def( "__str__", std_string_from_seqan< infix_t >, "String representation." );
-    	}
-    };
-
-
     struct vertex_exposer
     : myrrh::python::expose_or_set_attribute< vertex_exposer >
     {
@@ -192,7 +173,7 @@ struct index_exposer {
 
 		py::scope scope( _class );
 		top_down_exposer()( scope, "TopDownIterator" );
-		infix_exposer()( scope, "Infix" );
+		infix_exposer< TText const >()( scope, "Infix" );
 		vertex_exposer()( scope, "Vertex" );
     }
 };

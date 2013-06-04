@@ -11,6 +11,8 @@
 #include <seqan/python/defs.h>
 #include <seqan/python/container.h>
 #include <seqan/python/simple_type.h>
+#include <seqan/python/infix.h>
+
 #include <seqan/sequence.h>
 
 
@@ -20,22 +22,6 @@
 namespace seqan {
 namespace python {
 
-
-
-template< typename infix_t >
-void
-expose_infix() {
-    namespace py = boost::python;
-
-    py::class_<
-		infix_t
-	> infix_class(
-		"Infix",
-		"Infix of string."
-	);
-	const_container_exposer< infix_t >::expose( infix_class );
-	infix_class.def( "__str__", std_string_from_seqan< infix_t >, "String representation." );
-}
 
 
 /**
@@ -93,6 +79,11 @@ struct string_exposer
         }
     }
 
+    static
+    bool
+    equals_value( exposed_t const & s, TValue v ) {
+    	return 1 == seqan::length( s ) && s[ 0 ] == v;
+    }
 
     static
     void
@@ -112,18 +103,14 @@ struct string_exposer
         _class.def( "__str__", std_string_from_seqan< exposed_t >, "String representation." );
         _class.def( "__getitem__", __getitem__, "Get individual value or a slice. No support for irregular step sizes.", py::with_custodian_and_ward_postcall< 0, 1 >() );
         _class.def( "infix", _infix, "Infix of the string.", py::with_custodian_and_ward_postcall< 0, 1 >() );
+        _class.def( "__eq__", equals_value );
+        _class.def( py::self == py::self );
+        _class.def( py::self == std::string() );
+        _class.def( py::self == infix_t() );
 
         py::scope scope( _class );
-
-        // the class to represent an infix
-        {
-			auto registration = myrrh::python::get_registration< infix_t >();
-			if( registration ) {
-				scope.attr( "Infix" ) = py::handle<>( registration->m_class_object );
-			} else {
-				expose_infix< infix_t >();
-			}
-        }
+        infix_exposer< exposed_t >()( scope, "Infix" );
+        simple_type_exposer< TValue >()( scope, "Value" );
     }
 };
 
