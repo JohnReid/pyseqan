@@ -10,6 +10,73 @@ from . import fasta_file
 import logging, seqan, sys
 from itertools import combinations
 
+def test_inspect_string():
+    logging.info(sys._getframe().f_code.co_name)
+    s = 'ACGTACGTACGTNNN'
+    seqan.check_string_conversion(seqan.StringDna5(s))
+    seqan.check_string_conversion(s)
+    
+
+def infix_maker(str_type):
+    def make_infix(s):
+        string = str_type(s)
+        infix = string[:]
+        return infix
+    return make_infix
+
+
+def check_strs_eq(s1, s2):
+    assert s1 == s2, '(%s) %s != %s (%s)' % (type(s1), s1, s2, type(s2))
+
+
+def check_strs_ne(s1, s2):
+    assert s1 != s2, '(%s) %s == %s (%s)' % (type(s1), s1, s2, type(s2))
+
+
+def check_comparisons(str_type_1, str_type_2):
+    a0, a1, a2 = str_type_1('A'), str_type_1('A'), str_type_2('A')
+    a3 = a1[0]
+    assert isinstance(a1, str) or type(a3) == a1.Value
+    g1, g2 = str_type_1('G'), str_type_2('G')
+    g3 = g1[0]
+    logging.info('Checking %s(%s) against %s(%s)', type(a1), a1, type(a2), a2)
+    check_strs_eq(a0, a1)
+    check_strs_eq(a1, a0)
+    check_strs_eq(a1, a1)
+    check_strs_eq(a1, a2)
+    check_strs_eq(a1, a2)
+    check_strs_eq(a1, a3)
+    check_strs_eq(a3, a1)
+    check_strs_ne(a1, g1)
+    check_strs_ne(a1, g2)
+    check_strs_ne(a1, g3)
+    check_strs_ne(g3, a1)
+
+
+def check_comparisons_both_ways(str_type_1, str_type_2):
+    check_comparisons(str_type_1, str_type_2)
+    check_comparisons(str_type_2, str_type_1)
+
+
+def test_string_comparison():
+    logging.info(sys._getframe().f_code.co_name)
+    for str_type_1, str_type_2 in combinations((str, seqan.StringDna, infix_maker(seqan.StringDna)), 2):
+        check_comparisons_both_ways(str_type_1, str_type_2)
+    for str_type_1, str_type_2 in combinations((str, seqan.StringDna5, infix_maker(seqan.StringDna5)), 2):
+        check_comparisons_both_ways(str_type_1, str_type_2)
+
+
+def test_string_infix_types_different():
+    logging.info(sys._getframe().f_code.co_name)
+    # check types are different
+    assert seqan.StringDna.Infix != seqan.StringDna5.Infix
+    
+    # check string representations different - they actually have same name
+#     assert str(seqan.StringDna.Infix) != str(seqan.StringDna5.Infix), \
+#         '%s == %s' % (seqan.StringDna.Infix, seqan.StringDna5.Infix)
+
+
+
 def test_strings():
     logging.info(sys._getframe().f_code.co_name)
     _num_bases, sequences, ids = seqan.readFastaDna5(fasta_file('dm01r.fasta'))
@@ -81,38 +148,3 @@ def test_string_set_iteration():
     map(len, stringset)
 
 
-def infix_maker(str_type):
-    def make_infix(s):
-        string = str_type(s)
-        infix = string[:]
-        return infix
-    return make_infix
-
-
-def check_comparisons(str_type_1, str_type_2):
-    a1, a2 = str_type_1('A'), str_type_2('A')
-    a3 = a1[0]
-    assert isinstance(a1, str) or type(a3) == a1.Value
-    g1, g2 = str_type_1('G'), str_type_2('G')
-    g3 = g1[0]
-    logging.info('Checking %s(%s) against %s(%s)', type(a1), a1, type(a2), a2)
-    assert a1 == a1
-    assert a1 == a2
-    assert a1 == a3, '%s != %s' % (a1, a3)
-    assert a3 == a1, '%s != %s' % (a3, a1)
-    assert a1 != g1
-    assert a1 != g2
-    assert a1 != g3
-    assert a1 != g3, '%s == %s' % (a1, g3)
-    assert g3 != a1, '%s == %s' % (g3, a1)
-
-
-def check_comparisons_both_ways(str_type_1, str_type_2):
-    check_comparisons(str_type_1, str_type_2)
-    check_comparisons(str_type_2, str_type_1)
-
-
-def test_string_comparison():
-    logging.info(sys._getframe().f_code.co_name)
-    for str_type_1, str_type_2 in combinations((str, seqan.StringDna, infix_maker(seqan.StringDna)), 2):
-        check_comparisons_both_ways(str_type_1, str_type_2)

@@ -141,7 +141,6 @@ struct index_exposer {
 
     	void
     	expose( const char * name ) {
-            namespace py = boost::python;
 			py::class_< exposed_type > vertex_class(
 				name,
 				"A vertex in an index.",
@@ -157,7 +156,6 @@ struct index_exposer {
     static
     void
     expose() {
-        namespace py = boost::python;
 
         py::class_<
             exposed_t,

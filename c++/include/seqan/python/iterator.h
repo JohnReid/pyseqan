@@ -82,6 +82,47 @@ struct topdown_iterator_exposer {
         return goDown( it, c );
     }
 
+    /**
+     * Descend the iterator following the text in the string. The iterator
+     * will be moved as far down the tree as matches the string. Returns
+     * true iff the whole string is matched.
+     */
+    static
+    bool
+    go_down_str( exposed_t & it, py::object str ) {
+    	using boost::adaptors::transformed;
+    	using boost::adaptors::sliced;
+    	str = seqanise_string< string_t >( str );
+    	try {
+    		myrrh::python::extract_fn< alphabet_t > extract;
+    		const size_t N = boost::size( str );
+    		size_t n = 0;
+    		while( n < N ) {
+    			// if we can't match the first character of the rest of our string return false
+    			const alphabet_t first = extract( str[ n ] );
+    			if( ! goDown( it, first ) ) {
+    				return false;
+    			}
+    			const size_t edge_len = std::min( parentEdgeLength( it ), N - n );
+    			// check we can match the rest of our parent edge
+    			if( edge_len > 1 ) {
+    				for( size_t i = 1; edge_len != i; ++i ) {
+    					if( parentEdgeLabel( it )[ i ] != extract( str[ n + i ] ) ) {
+    						return false;
+    					}
+    				}
+    			}
+    			// increment our index into the string
+    			n += edge_len;
+    		}
+        } catch( ... ) {
+			// If an exception was thrown, translate it to Python
+			boost::python::handle_exception();
+			return false;
+        }
+        return true;
+    }
+
     static
     bool
     go_right( exposed_t & it ) {
@@ -109,7 +150,6 @@ struct topdown_iterator_exposer {
     static
     void
     expose( const char * name = "TopDownIterator" ) {
-        namespace py = boost::python;
 
         py::class_<
             exposed_t
@@ -130,6 +170,7 @@ struct topdown_iterator_exposer {
         _class.add_property( "isRoot", is_root, "Does the iterator point at the root of the index?" );
         _class.def( "goDown", go_down, "Iterates down one edge or a path in a tree." );
         _class.def( "goDownChar", go_down_char, "Iterates down one edge or a path in a tree which starts with given character." );
+        _class.def( "goDownStr", go_down_str, "Iterates down the iterator following the string." );
         _class.def( "goRight", go_right, "Iterates to the next sibling in a tree." );
         _class.def( "__copy__", __copy__, "Returns a copy of this iterator." );
     }

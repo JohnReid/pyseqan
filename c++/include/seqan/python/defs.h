@@ -13,6 +13,8 @@
 namespace seqan {
 namespace python {
 
+namespace py = boost::python;
+
 
 typedef std::vector< std::string > string_vector; ///< A vector of strings.
 typedef unsigned long long max_representing_t; ///< Largest integer type to store sizes.

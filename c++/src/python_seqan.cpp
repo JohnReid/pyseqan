@@ -16,7 +16,6 @@
 //
 // Use some namespaces.
 //
-namespace py = boost::python;
 using namespace seqan::python;
 
 
@@ -34,11 +33,12 @@ const char * _simple_type_name< Rna5_ >::result      = "Rna5";
 const char * _simple_type_name< Iupac_ >::result     = "Iupac";
 const char * _simple_type_name< AminoAcid_ >::result = "AminoAcid";
 
+void
+check_string_conversion( String< Dna5 > const & s ) {
+}
+
 } // namespace python
 } // namespace seqan
-
-
-
 
 
 
@@ -61,6 +61,9 @@ expose_seqan() {
 
 
 	using namespace seqan;
+
+	py::def( "check_string_conversion", check_string_conversion );
+
 
     simple_type_exposer< Dna >::expose();
     simple_type_exposer< Dna5 >::expose();

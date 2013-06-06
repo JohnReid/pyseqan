@@ -48,65 +48,32 @@ struct string_exposer
     }
 
     static
-    boost::python::object
-    __getitem__( exposed_t & _self, boost::python::object i ) {
-        namespace py = boost::python;
-        if( PySlice_Check( i.ptr() ) ) {
-            Py_ssize_t start, stop, step, slicelength;
-            if( 0 != PySlice_GetIndicesEx(
-                    reinterpret_cast< PySliceObject * >( i.ptr() ),
-                    length( _self ),
-                    &start,
-                    &stop,
-                    &step,
-                    &slicelength
-                )
-            ) {
-                throw std::logic_error( "Could not get indices from slice object." );
-            }
-            if( 1 != step ) {
-                throw std::logic_error( "Step size not supported. Only step sizes of 1 are supported." );
-            }
-            return py::object( infix( _self, start, stop ) );
-        } else {
-            const position_t pos = py::extract< position_t >( i )();
-            if( pos < 0 || pos >= length( _self ) ) {
-                set_index_error();
-                return py::object();
-            } else {
-                return py::object( const_container_exposer< exposed_t >::_value( _self, pos ) );
-            }
-        }
-    }
-
-    static
-    bool
-    equals_value( exposed_t const & s, TValue v ) {
-    	return 1 == seqan::length( s ) && s[ 0 ] == v;
-    }
-
-    static
     void
     expose() {
-        namespace py = boost::python;
-
-        py::class_<
-            exposed_t,
-            boost::shared_ptr< exposed_t >,
-            boost::noncopyable
-        > _class(
-            MYRRH_MAKE_STRING( "String" << simple_type_name< TValue >() ).c_str(),
-            "Wrapper for SeqAn C++ string.",
-            py::init< std::string const & >( py::args( "x" ), "Construct a SeqAn string from the python string, x." )
-        );
+		py::class_<
+			exposed_t,
+			boost::shared_ptr< exposed_t >,
+			boost::noncopyable
+		> _class(
+			MYRRH_MAKE_STRING( "String" << simple_type_name< TValue >() ).c_str(),
+			"Wrapper for SeqAn C++ string.",
+			py::init< std::string const & >( py::args( "x" ), "Construct a SeqAn string from the python string, x." )
+		);
         container_exposer< exposed_t >::expose( _class );
         _class.def( "__str__", std_string_from_seqan< exposed_t >, "String representation." );
-        _class.def( "__getitem__", __getitem__, "Get individual value or a slice. No support for irregular step sizes.", py::with_custodian_and_ward_postcall< 0, 1 >() );
+        _class.def( "__getitem__", __getitem__< exposed_t >, "Get individual value or a slice. No support for irregular step sizes.", py::with_custodian_and_ward_postcall< 0, 1 >() );
         _class.def( "infix", _infix, "Infix of the string.", py::with_custodian_and_ward_postcall< 0, 1 >() );
-        _class.def( "__eq__", equals_value );
-        _class.def( py::self == py::self );
-        _class.def( py::self == std::string() );
-        _class.def( py::self == infix_t() );
+        _class.def( "__eq__", string_equals< exposed_t > );
+//        _class.def( "__eq__", equals_value< exposed_t > );
+//        _class.def( "__ne__", notequals_value< exposed_t > );
+//        _class.def( py::self == py::self );
+//        _class.def( py::self != py::self );
+//        _class.def( py::self == std::string() );
+//        _class.def( py::self != std::string() );
+//        _class.def( py::self == infix_t() );
+//        _class.def( py::self != infix_t() );
+
+        py::implicitly_convertible< std::string, exposed_t >();
 
         py::scope scope( _class );
         infix_exposer< exposed_t >()( scope, "Infix" );
@@ -129,8 +96,6 @@ struct string_set_exposer
     static
     void
     expose() {
-        namespace py = boost::python;
-
         py::class_<
             exposed_t,
             boost::shared_ptr< exposed_t >,
@@ -222,8 +187,6 @@ expose_string_functionality()
 {
     typedef String< TValue, TStringSpec > string_t;
     typedef StringSet< string_t > string_set_t;
-
-    namespace py = boost::python;
 
     //register_seqan_string_to_python< typename Infix< string_t >::Type >();
     string_exposer< TValue, TStringSpec >::expose();

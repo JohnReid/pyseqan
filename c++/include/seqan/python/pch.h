@@ -12,6 +12,7 @@
 
 #include <myrrh/defs.h>
 #include <myrrh/python/boost_function.h>
+#include <myrrh/python/boost_range.h>
 #include <myrrh/python/registry.h>
 #include <myrrh/seqan_boost_range_adaptors.h>
 
@@ -20,7 +21,8 @@
 #include <boost/python/signature.hpp>
 #include <boost/python/object/pointer_holder.hpp>
 #include <boost/python/suite/indexing/vector.hpp>
-#include <boost/range/adaptor/reversed.hpp>
+#include <boost/range/algorithm.hpp>
+#include <boost/range/adaptors.hpp>
 #include <boost/spirit/include/qi.hpp>
 #include <boost/type_traits/config.hpp>
 #include <boost/type_traits/cv_traits.hpp>

@@ -8,6 +8,54 @@ Test assigning iterator functionality.
 
 from . import fasta_file
 import seqan, logging, sys
+from copy import copy
+
+
+def _make_test_index():
+    strings = seqan.StringDna5Set()
+    strings.appendValue(seqan.StringDna5('ACG'))
+    strings.appendValue(seqan.StringDna5('AA'))
+    strings.appendValue(seqan.StringDna5('NN'))
+    return seqan.IndexEsaDna5(strings)
+
+
+def test_representative_equality():
+    logging.info(sys._getframe().f_code.co_name)
+    index = _make_test_index()
+    i = index.TopDownIterator(index)
+    for n, c in enumerate('ACG'):
+        i.goDownChar(c)
+        logging.info(i.representative[:n+1])
+        assert i.representative[:n+1] == 'ACG'[:n+1]
+        assert 'ACG'[:n+1] == i.representative[:n+1]
+
+
+
+def check_go_down_str(i, s, representative):
+    i.goDownStr(s)
+    assert representative == i.representative
+
+    
+def test_go_down_str():
+    logging.info(sys._getframe().f_code.co_name)
+    index = _make_test_index()
+    i = index.TopDownIterator(index)
+    assert copy(i).goDownStr(seqan.StringDna5('C'))
+    assert copy(i).goDownStr('C')
+    assert not copy(i).goDownStr(seqan.StringDna5('T'))
+    assert not copy(i).goDownStr('T')
+    assert not copy(i).goDownStr(seqan.StringDna5('ACGT'))
+    assert copy(i).goDownStr('AC')
+    assert copy(i).goDownStr(seqan.StringDna5('AC'))
+    assert copy(i).goDownStr(seqan.StringDna5('ACG'))
+    assert copy(i).goDownStr('AA')
+    assert copy(i).goDownStr('A')
+    assert copy(i).goDownStr('NN')
+    assert copy(i).goDownStr('N')
+    check_go_down_str(copy(i), seqan.StringDna5('ACG'), 'ACG')
+    check_go_down_str(copy(i), seqan.StringDna5('AC' ), 'ACG')
+    
+
 
 def test_iterator():
     logging.info(sys._getframe().f_code.co_name)

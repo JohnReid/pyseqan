@@ -72,6 +72,7 @@ simple_type_name() {
     return _simple_type_name< typename Spec< TValue >::Type >::result;
 }
 
+
 /**
  * Simple type exposer.
  */
@@ -90,8 +91,6 @@ struct simple_type_exposer
     static
     void
     expose( const char * name = 0 ) {
-        namespace py = boost::python;
-
         py::class_< Exposed > _class(
             name ? name : simple_type_name< Exposed >(),
             "Wrapper for SeqAn C++ alphabet.",
@@ -100,18 +99,14 @@ struct simple_type_exposer
         _class.def( "__init__", py::make_constructor( make_from_string ) );
         _class.def( "__str__", __str__, "A string representation of this simple type." );
 
-		_class.def( py::self == py::self );
-		_class.def( py::self != py::self );
-		_class.def( py::self <= py::self );
-		_class.def( py::self >= py::self );
-		_class.def( py::self <  py::self );
-		_class.def( py::self >  py::self );
-
+        _class.def( "__eq__", __eq__, "Equality." );
         _class.def( "__hash__", _ordValue, "Hash value." );
         _class.add_static_property( "valueSize", _valueSize );
         _class.add_property( "ordValue", _ordValue, "An unsigned value between 0 and valueSize." );
 
-        py::implicitly_convertible< Exposed, char >();
+        // having implicitly convertible in both directions causes problems in string comparison
+        // operators. Specifically infinite recursions
+//        py::implicitly_convertible< Exposed, char >();
         py::implicitly_convertible< char, Exposed >();
     }
 
@@ -122,6 +117,32 @@ struct simple_type_exposer
     		throw std::invalid_argument( "Can only make a simple type from strings of length one." );
     	}
         return new Exposed( s[ 0 ] );
+    }
+
+    static
+    size_t
+    __eq__( Exposed const & _self, py::object other ) {
+    	// first check if we have an exposed type
+    	py::extract< Exposed > exposed_extractor( other );
+    	if( exposed_extractor.check() ) {
+    		return exposed_extractor() == _self;
+    	}
+
+    	// otherwise check if we have char
+    	py::extract< char > char_extractor( other );
+    	if( char_extractor.check() ) {
+    		return char_extractor() == _self;
+    	}
+
+    	// if it is an object of length 1 then check whether we are equal to this first element
+    	// this allows us to compare simple types to strings of length 1.
+    	try {
+    		return 1 == py::len( other ) && __eq__( _self, other[ 0 ] );
+    	} catch( ... ) {
+    		PyErr_Clear();
+    	}
+
+        return false;
     }
 
     static

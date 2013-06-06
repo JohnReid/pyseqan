@@ -10,6 +10,7 @@
 
 #include <seqan/python/defs.h>
 
+#include <seqan/basic.h>
 
 
 
@@ -22,6 +23,22 @@ inline
 void index_error() {
 	PyErr_SetString( PyExc_IndexError, "Index out of range" );
 }
+
+
+template< typename TContainer >
+bool
+equals_value( TContainer const & s, typename GetValue< TContainer >::Type v ) {
+	return 1 == seqan::length( s ) && s[ 0 ] == v;
+}
+
+
+template< typename TContainer >
+bool
+notequals_value( TContainer const & s, typename GetValue< TContainer >::Type v ) {
+	return 1 != seqan::length( s ) || s[ 0 ] != v;
+}
+
+
 
 
 /**
@@ -42,7 +59,6 @@ struct const_container_exposer {
     static
     void
     expose( Class & _class ) {
-        namespace py = boost::python;
         _class.def( "empty", _empty, "Is the container empty?" );
         _class.def( "__nonzero__", __nonzero__, "Is the container not empty?" );
         _class.def( "__len__", __len__, "The length of the container." );
@@ -107,7 +123,6 @@ struct container_exposer {
     static
     void
     expose( Class & _class ) {
-        namespace py = boost::python;
         const_container_exposer< exposed_t >::expose( _class );
         _class.def( "appendValue", _appendValue, "Append a value to this container." );
         _class.def( "resize", _resize, "Resize the container." );
@@ -127,6 +142,39 @@ struct container_exposer {
 
 };
 
+
+template< typename TContainer >
+boost::python::object
+__getitem__( TContainer & _self, boost::python::object i ) {
+    typedef typename Position< TContainer >::Type position_t;
+
+    if( PySlice_Check( i.ptr() ) ) {
+        Py_ssize_t start, stop, step, slicelength;
+        if( 0 != PySlice_GetIndicesEx(
+                reinterpret_cast< PySliceObject * >( i.ptr() ),
+                length( _self ),
+                &start,
+                &stop,
+                &step,
+                &slicelength
+            )
+        ) {
+            throw std::logic_error( "Could not get indices from slice object." );
+        }
+        if( 1 != step ) {
+            throw std::logic_error( "Step size not supported. Only step sizes of 1 are supported." );
+        }
+        return py::object( infix( _self, start, stop ) );
+    } else {
+        const position_t pos = py::extract< position_t >( i )();
+        if( pos < 0 || pos >= length( _self ) ) {
+            set_index_error();
+            return py::object();
+        } else {
+            return py::object( const_container_exposer< TContainer >::_value( _self, pos ) );
+        }
+    }
+}
 
 
 

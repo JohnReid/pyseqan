@@ -1,0 +1,7 @@
+use-project boost : $(BOOST_ROOT) ;
+
+project : requirements <include>$(BOOST_ROOT) ;
+
+exe sliced-iterator-range : sliced-iterator-range.cpp ;
+
+
