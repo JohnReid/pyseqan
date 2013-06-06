@@ -40,42 +40,6 @@ seqanise_string( py::object str ) {
 }
 
 
-namespace {
-
-
-/**
- * Test if every position in both sequences is the same. Assumes both sequences
- * are the same length. If cannot extract TValue type from the python sequence
- * will throw an exception.
- */
-template< typename TValue, typename TContainer >
-bool
-equal_by_position( TContainer const & c_seq, py::object py_seq ) {
-	unsigned i = 0;
-	BOOST_FOREACH( TValue extracted, myrrh::python::make_boost_range< TValue >( py_seq ) ) {
-		if( extracted != c_seq[ i ] ) {
-			return false;
-		}
-		++i;
-	}
-	return true;
-}
-
-/** Extract the ordinal value from a simple type. */
-template< typename TSimpleType >
-struct extract_ord_value {
-	typedef typename Size< TSimpleType >::Type result_type;
-
-	result_type
-	operator()( TSimpleType x ) const {
-		return ordValue( x );
-	}
-};
-
-} // anonymous namespace
-
-
-
 template< typename TString >
 bool
 string_equals( TString const & str, py::object obj ) {
@@ -140,14 +104,6 @@ struct infix_exposer
 		_class.def( "__str__", std_string_from_seqan< exposed_type >, "String representation." );
         _class.def( "__getitem__", __getitem__< exposed_type >, "Get individual value or a slice. No support for irregular step sizes.", py::with_custodian_and_ward_postcall< 0, 1 >() );
         _class.def( "__eq__", string_equals< exposed_type > );
-//        _class.def( "__eq__", equals_value< exposed_type > );
-//        _class.def( "__ne__", notequals_value< exposed_type > );
-//		_class.def( py::self == py::self );
-//		_class.def( py::self != py::self );
-//		_class.def( py::self == TString() );
-//		_class.def( py::self != TString() );
-//		_class.def( py::self == std::string() );
-//		_class.def( py::self != std::string() );
 
 		py::scope scope( _class );
 		simple_type_exposer< value_type >()( scope, "Value" );
