@@ -85,6 +85,13 @@ string_equals( TString const & str, py::object obj ) {
 }
 
 
+template< typename TString >
+bool
+string_notequals( TString const & str, py::object obj ) {
+	return ! string_equals( str, obj );
+}
+
+
 
 template< typename TString >
 struct infix_exposer
@@ -104,6 +111,7 @@ struct infix_exposer
 		_class.def( "__str__", std_string_from_seqan< exposed_type >, "String representation." );
         _class.def( "__getitem__", __getitem__< exposed_type >, "Get individual value or a slice. No support for irregular step sizes.", py::with_custodian_and_ward_postcall< 0, 1 >() );
         _class.def( "__eq__", string_equals< exposed_type > );
+        _class.def( "__ne__", string_notequals< exposed_type > );
 
 		py::scope scope( _class );
 		simple_type_exposer< value_type >()( scope, "Value" );

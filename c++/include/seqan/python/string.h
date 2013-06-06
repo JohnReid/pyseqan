@@ -64,6 +64,7 @@ struct string_exposer
         _class.def( "__getitem__", __getitem__< exposed_t >, "Get individual value or a slice. No support for irregular step sizes.", py::with_custodian_and_ward_postcall< 0, 1 >() );
         _class.def( "infix", _infix, "Infix of the string.", py::with_custodian_and_ward_postcall< 0, 1 >() );
         _class.def( "__eq__", string_equals< exposed_t > );
+        _class.def( "__ne__", string_notequals< exposed_t > );
 
         py::implicitly_convertible< std::string, exposed_t >();
 

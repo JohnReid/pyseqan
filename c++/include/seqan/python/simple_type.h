@@ -100,6 +100,7 @@ struct simple_type_exposer
         _class.def( "__str__", __str__, "A string representation of this simple type." );
 
         _class.def( "__eq__", __eq__, "Equality." );
+        _class.def( "__ne__", __ne__, "Inequality." );
         _class.def( "__hash__", _ordValue, "Hash value." );
         _class.add_static_property( "valueSize", _valueSize );
         _class.add_property( "ordValue", _ordValue, "An unsigned value between 0 and valueSize." );
@@ -117,6 +118,12 @@ struct simple_type_exposer
     		throw std::invalid_argument( "Can only make a simple type from strings of length one." );
     	}
         return new Exposed( s[ 0 ] );
+    }
+
+    static
+    size_t
+    __ne__( Exposed const & _self, py::object other ) {
+    	return ! __eq__( _self, other );
     }
 
     static

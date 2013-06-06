@@ -177,52 +177,6 @@ struct index_exposer {
 };
 
 
-//    //
-//    // Get the limits on number, length and total length of sequences.
-//    //
-//    static const max_representing_t index_max_seqs
-//        = ( max_representing_t )( std::numeric_limits< types<>::seq_index_t >::max() ) + 1;
-//    static const max_representing_t index_max_seq_length
-//        = ( max_representing_t )( std::numeric_limits< types<>::seq_offset_t >::max() ) + 1;
-//    static const max_representing_t index_max_text_length
-//        = ( max_representing_t )( std::numeric_limits< types<>::text_offset_t >::max() ) + 1;
-//
-//    //
-//    // Limits on the lengths of texts and sequences
-//    //
-//    py::scope().attr( "index_max_seqs" ) = index_max_seqs;
-//    py::scope().attr( "index_max_seq_length" ) = index_max_seq_length;
-//    py::scope().attr( "index_max_text_length" ) = index_max_text_length;
-//
-//
-//
-//    /**
-//     * Build an index from the text.
-//     */
-//    boost::shared_ptr< exposed_t >
-//    build_index( TText const & sequences )
-//    {
-//        if( index_max_seqs < length( sequences ) ) {
-//            throw std::length_error( "Too many sequences for this index type." );
-//        }
-//        max_representing_t total = 0;
-//        BOOST_FOREACH( const pyseqan_types::string_t & seq, sequences ) {
-//            if( index_max_seq_length < length( seq ) ) {
-//                throw std::length_error( "Sequence too long for this index type." );
-//            }
-//            total += length( seq );
-//        }
-//        if( total > index_max_text_length ) {
-//            throw std::length_error( "Total sequence length too big for this index type." );
-//        }
-//        return pyseqan_types::index_ptr_t( new pyseqan_types::index_t( sequences ) );
-//    }
-//    //
-//    // Building an index.
-//    //
-//    py::def( "build_index", build_index, "Build a seqan index from a string set." );
-
-
 } // namespace python
 } // namespace seqan
 
