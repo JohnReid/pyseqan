@@ -1,7 +1,7 @@
 /** Copyright John Reid 2013
  *
  * \file
- * \brief Code to expose strings and string sets.
+ * \brief Code to expose seqan containers.
  *
  */
 
@@ -20,25 +20,10 @@ namespace python {
 
 
 inline
-void index_error() {
+void
+index_error() {
 	PyErr_SetString( PyExc_IndexError, "Index out of range" );
 }
-
-
-template< typename TContainer >
-bool
-equals_value( TContainer const & s, typename GetValue< TContainer >::Type v ) {
-	return 1 == seqan::length( s ) && s[ 0 ] == v;
-}
-
-
-template< typename TContainer >
-bool
-notequals_value( TContainer const & s, typename GetValue< TContainer >::Type v ) {
-	return 1 != seqan::length( s ) || s[ 0 ] != v;
-}
-
-
 
 
 /**

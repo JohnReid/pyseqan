@@ -35,7 +35,7 @@ def check_g(x):
 
 
 def test_n():
-    logging.info(sys._getframe().f_code.co_name)    
+    logging.info(sys._getframe().f_code.co_name)
     check_n(Dna5('N'))
     check_n('N')
     for x in 'N':
@@ -44,7 +44,7 @@ def test_n():
         check_n(x)
         
 def test_g():
-    logging.info(sys._getframe().f_code.co_name)    
+    logging.info(sys._getframe().f_code.co_name)
     check_g(Dna5('G'))
     check_g('G')
     for x in 'G':
