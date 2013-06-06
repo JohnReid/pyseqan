@@ -6,5 +6,5 @@ export PYSEQANDEBUG=1
 
 # Create suppressions file for general python seqan suppressions
 $VALGRIND --log-file=tmp.log "$@" >tmp.out
-cat tmp.log | ./parse-valgrind-suppressions
+cat tmp.log | parse-valgrind-suppressions
 
