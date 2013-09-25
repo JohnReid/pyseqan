@@ -164,7 +164,10 @@ struct index_exposer {
         > _class(
             MYRRH_MAKE_STRING( "Index" << index_spec_name< exposed_t >() << simple_type_name< alphabet_t >() ).c_str(),
             "Wrapper for C++ seqan index.",
-            py::init< TText const & >( py::args( "index" ), "Construct an index from the text." )
+            py::init< TText const & >(
+				py::arg( "index" ),
+				"Construct an index from the text."
+			)[ py::with_custodian_and_ward< 1, 2 >() ]
         );
         _class.def( "visit", visit_tree, "Visit all the nodes in a tree. This can be useful to build the suffix tree ahead of doing any timings." );
         _class.def( "__len__", __len__, "The length of the index." );

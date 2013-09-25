@@ -157,7 +157,7 @@ struct topdown_iterator_exposer {
             "TopDownIterator",
             "Wrapper for C++ SeqAn top down iterater.",
             py::init< container_t & >(
-                py::args( "index" ),
+                py::arg( "index" ),
                 "Construct the iterator from the index."
             )[ py::with_custodian_and_ward< 1, 2 >() ]
         );

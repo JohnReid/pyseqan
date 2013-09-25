@@ -32,6 +32,7 @@ template< typename TString >
 py::object
 seqanise_string( py::object str ) {
 	if( PyString_Check( str.ptr() ) ) {
+		//std::cout << "Seqanising\n";
 		boost::shared_ptr< TString > seqanised( new TString( py::extract< TString >( str )() ) );
 		return py::object( seqanised );
 	} else {

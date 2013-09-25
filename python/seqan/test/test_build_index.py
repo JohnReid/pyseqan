@@ -6,24 +6,25 @@
 Test building an index.
 """
 
-import seqan, sys, logging
-from . import fasta_file, show_shallow_tree
+from setup_environment import init_test_env, update_path_for_seqan, logging, fasta_file, log_path
+init_test_env(__file__, level=logging.INFO)
+update_path_for_seqan()
+log_path(logging.DEBUG)
 
-def test_build_index():
-    logging.info(sys._getframe().f_code.co_name)
-    _num_bases, sequences, _ids = seqan.readFastaDna5(fasta_file('dm01r.fasta'))
-    index = seqan.IndexEsaDna5(sequences)
-    show_shallow_tree(index.TopDownIterator(index))
+import os, sys, seqan
+from copy import copy
 
+num_bases, sequences, ids = seqan.readFastaDna5(fasta_file('dm01r.fasta'))
+index = seqan.IndexEsaDna5(sequences)
 
+def descend(i):
+    if len(i.representative) < 3:
+        logging.info('%-2s : %5d', i.representative, i.countOccurrences)
+        #1/0
+        if i.goDown():
+            while True:
+                descend(copy(i)) 
+                if not i.goRight():
+                    break
 
-def test_infix_comparison():
-    logging.info(sys._getframe().f_code.co_name)
-    _num_bases, sequences, _ids = seqan.readFastaDna5(fasta_file('dm01r.fasta'))
-    index = seqan.IndexEsaDna5(sequences)
-    i = index.TopDownIterator(index)
-    i.goDownChar('A')
-    i.goDownChar('T')
-    i.goDownChar('C')
-    assert 'ATC' == i.representative, i.representative
-
+descend(index.TopDownIterator(index))

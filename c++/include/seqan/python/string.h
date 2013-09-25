@@ -57,7 +57,10 @@ struct string_exposer
 		> _class(
 			MYRRH_MAKE_STRING( "String" << simple_type_name< TValue >() ).c_str(),
 			"Wrapper for SeqAn C++ string.",
-			py::init< std::string const & >( py::args( "x" ), "Construct a SeqAn string from the python string, x." )
+			py::init< std::string const & >(
+				py::arg( "x" ),
+				"Construct a SeqAn string from the python string, x."
+			)
 		);
         container_exposer< exposed_t >::expose( _class );
         _class.def( "__str__", std_string_from_seqan< exposed_t >, "String representation." );

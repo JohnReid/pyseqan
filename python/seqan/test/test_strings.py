@@ -148,3 +148,8 @@ def test_string_set_iteration():
     map(len, stringset)
 
 
+def test_string_set_append():
+    logging.info(sys._getframe().f_code.co_name)
+    stringset = seqan.StringDna5Set()
+    stringset.appendValue(seqan.StringDna5('ACGTACGTACGTNNN'))
+    
