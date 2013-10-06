@@ -9,6 +9,7 @@
 #define PYSEQAN_ITERATOR_JR_14FEB2013_DEFS_H_
 
 #include <seqan/python/defs.h>
+#include <myrrh/python/boost_range.h>
 
 
 
@@ -90,35 +91,35 @@ struct topdown_iterator_exposer {
     static
     bool
     go_down_str( exposed_t & it, py::object str ) {
-    	using boost::adaptors::transformed;
-    	using boost::adaptors::sliced;
-    	str = seqanise_string< string_t >( str );
-    	try {
-    		myrrh::python::extract_fn< alphabet_t > extract;
-    		const size_t N = boost::size( str );
-    		size_t n = 0;
-    		while( n < N ) {
-    			// if we can't match the first character of the rest of our string return false
-    			const alphabet_t first = extract( str[ n ] );
-    			if( ! goDown( it, first ) ) {
-    				return false;
-    			}
-    			const size_t edge_len = std::min( parentEdgeLength( it ), N - n );
-    			// check we can match the rest of our parent edge
-    			if( edge_len > 1 ) {
-    				for( size_t i = 1; edge_len != i; ++i ) {
-    					if( parentEdgeLabel( it )[ i ] != extract( str[ n + i ] ) ) {
-    						return false;
-    					}
-    				}
-    			}
-    			// increment our index into the string
-    			n += edge_len;
-    		}
+        using boost::adaptors::transformed;
+        using boost::adaptors::sliced;
+        str = seqanise_string< string_t >( str );
+        try {
+            myrrh::python::extract_fn< alphabet_t > extract;
+            const size_t N = boost::size( str );
+            size_t n = 0;
+            while( n < N ) {
+                // if we can't match the first character of the rest of our string return false
+                const alphabet_t first = extract( str[ n ] );
+                if( ! goDown( it, first ) ) {
+                    return false;
+                }
+                const size_t edge_len = std::min( parentEdgeLength( it ), N - n );
+                // check we can match the rest of our parent edge
+                if( edge_len > 1 ) {
+                    for( size_t i = 1; edge_len != i; ++i ) {
+                        if( parentEdgeLabel( it )[ i ] != extract( str[ n + i ] ) ) {
+                            return false;
+                        }
+                    }
+                }
+                // increment our index into the string
+                n += edge_len;
+            }
         } catch( ... ) {
-			// If an exception was thrown, translate it to Python
-			boost::python::handle_exception();
-			return false;
+            // If an exception was thrown, translate it to Python
+            boost::python::handle_exception();
+            return false;
         }
         return true;
     }

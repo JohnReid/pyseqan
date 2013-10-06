@@ -21,28 +21,28 @@ path-constant DEBUG_INSTALL_DIR     : ../python/seqan/_debug_build ;
 # Project definition
 #
 project pyseqan
-	: requirements
-		<library>/boost/python//boost_python
-		<library>myrrh//myrrh
-		<use>/site-config//seqan
-		# <use>/site-config//numpy
-		<define>MS_HAS_VALGRIND
-		<toolset>gcc:<cxxflags>-Wno-deprecated
+    : requirements
+        <library>/boost/python//boost_python
+        <use>myrrh//myrrh
+        <use>/site-config//seqan
+        # <use>/site-config//numpy
+        <define>MS_HAS_VALGRIND
+        <toolset>gcc:<cxxflags>-Wno-deprecated
         <toolset>gcc:<cxxflags>-Wno-unused
         <toolset>gcc:<cxxflags>-std=c++0x
-		# <toolset>gcc:<cxxflags>-H # for seeing which files are included where : http://gamesfromwithin.com/the-care-and-feeding-of-pre-compiled-headers
+        # <toolset>gcc:<cxxflags>-H # for seeing which files are included where : http://gamesfromwithin.com/the-care-and-feeding-of-pre-compiled-headers
         # <toolset>gcc:<cxxflags>-MM # don't output object, write a list of include files
-		# <toolset>gcc:<cxxflags>-fno-inline # <<<<<<<<<<<<<<<<<<<<<< Don't forget to remove this !!!!!!!!!!!!!!
-		# <link>static
-		<include>.
-		<include>include
-		<include>$(BOOST_ROOT)
-		<include>$(BOOST_INDEXING_SUITE)
-		<variant>release:<define>MYRRH_DISABLE_ASSERTS
-		#<variant>debug:<python-debugging>on
-	: usage-requirements
-	: default-build release
-	;
+        # <toolset>gcc:<cxxflags>-fno-inline # <<<<<<<<<<<<<<<<<<<<<< Don't forget to remove this !!!!!!!!!!!!!!
+        # <link>static
+        <include>.
+        <include>include
+        <include>$(BOOST_ROOT)
+        <include>$(BOOST_INDEXING_SUITE)
+        <variant>release:<define>MYRRH_DISABLE_ASSERTS
+        #<variant>debug:<python-debugging>on
+    : usage-requirements
+    : default-build release
+    ;
 
 
 
@@ -58,15 +58,15 @@ cpp-pch pyseqan_pch
 # SeqAn extension
 #
 python-extension _seqan
-	: # sources	
-		src/module_pyseqan.cpp
-		src/python_seqan.cpp
-		$(PY_EXT_SOURCES)
-		pyseqan_pch
-	:
-		<variant>release:<linkflags>-Wl,-rpath,$(RELEASE_INSTALL_DIR)
-		<variant>debug:<linkflags>-Wl,-rpath,$(DEBUG_INSTALL_DIR)
-	    <target-os>linux:<source>/site-config//rt
+    : # sources
+        src/module_pyseqan.cpp
+        src/python_seqan.cpp
+        $(PY_EXT_SOURCES)
+        pyseqan_pch
+    :
+        <variant>release:<linkflags>-Wl,-rpath,$(RELEASE_INSTALL_DIR)
+        <variant>debug:<linkflags>-Wl,-rpath,$(DEBUG_INSTALL_DIR)
+        <target-os>linux:<source>/site-config//rt
     ;
 
 
@@ -76,10 +76,10 @@ python-extension _seqan
 #local PY_TEST_FILES = [ glob ../python/seqan/test/test_*.py ] ;
 #local PY_TESTS = $(PY_TEST_FILES:B) ;
 #for PY_TEST in $(PY_TESTS) {
-#	# create boost python test 
-#	local target = py_$(PY_TEST) ;
-#	bpl-test $(target) : ../python/seqan/test/$(PY_TEST).py _seqan install ;
-#	explicit $(target) ;
+#    # create boost python test
+#    local target = py_$(PY_TEST) ;
+#    bpl-test $(target) : ../python/seqan/test/$(PY_TEST).py _seqan install ;
+#    explicit $(target) ;
 #}
 # alias for all tests
 #alias all_pytests : py_$(PY_TESTS) ;
@@ -97,7 +97,7 @@ python-extension _seqan
 #
 install install
     :
-        _seqan 
+        _seqan
         /boost/python//boost_python
     :
         <variant>release:<location>$(RELEASE_INSTALL_DIR)
