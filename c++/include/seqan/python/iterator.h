@@ -96,7 +96,7 @@ struct topdown_iterator_exposer {
         str = seqanise_string< string_t >( str );
         try {
             myrrh::python::extract_fn< alphabet_t > extract;
-            const size_t N = boost::size( str );
+            const size_t N = py::len( str );
             size_t n = 0;
             while( n < N ) {
                 // if we can't match the first character of the rest of our string return false

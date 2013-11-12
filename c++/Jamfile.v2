@@ -120,3 +120,10 @@ python-extension test_registry_ext : src/module_test_registry.cpp ;
 run-test test_registry : bpl-tests/test_registry.py test_registry_ext ;
 #bpl-test test_registry : bpl-tests/test_registry.py test_registry_ext ;
 
+TEST_REQS =
+    <define>BOOST_TEST_DYN_LINK
+    <define>BOOST_TEST_MAIN
+    ;
+obj sandbox-range : sandbox/myrrh_boost_range.cpp myrrh//myrrh ;
+explicit sandbox-range ;
+
