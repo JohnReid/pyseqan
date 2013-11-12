@@ -6,8 +6,9 @@
 Test reading a FASTA file.
 """
 
-from . import fasta_file
-import logging, seqan
+from seqan.test import fasta_file
+import logging
+import seqan
 
 def test_read_fasta():
     filename = fasta_file('dm01r.fasta')
@@ -19,4 +20,3 @@ def test_read_fasta():
         assert 1500 == len(seq)
         logging.info('%5d bases in %s', len(seq), _id)
     map(len, sequences)
-    

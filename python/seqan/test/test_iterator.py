@@ -6,8 +6,10 @@
 Test assigning iterator functionality.
 """
 
-from . import fasta_file
-import seqan, logging, sys
+from seqan.test import fasta_file
+import seqan
+import logging
+import sys
 from copy import copy
 
 
@@ -35,7 +37,7 @@ def check_go_down_str(i, s, representative):
     i.goDownStr(s)
     assert representative == i.representative
 
-    
+
 def test_go_down_str():
     logging.info(sys._getframe().f_code.co_name)
     index = _make_test_index()
@@ -54,7 +56,7 @@ def test_go_down_str():
     assert copy(i).goDownStr('N')
     check_go_down_str(copy(i), seqan.StringDna5('ACG'), 'ACG')
     check_go_down_str(copy(i), seqan.StringDna5('AC' ), 'ACG')
-    
+
 
 
 def test_iterator():
@@ -62,11 +64,11 @@ def test_iterator():
     _num_bases, sequences, _ids = seqan.readFastaDna5(fasta_file('dm01r.fasta'))
     logging.info('Building index')
     index = seqan.IndexEsaDna5(sequences)
-    
+
     i = index.TopDownIterator(index)
     assert not i.representative
     assert i.representative.empty()
-    
+
     i.goDownChar('A')
     assert 'A' == i.representative, i.representative.Value
     i.goDownChar('C')
@@ -76,14 +78,14 @@ def test_iterator():
     i.goDownChar('C')
     assert 'ACTC' == i.representative
     logging.info(i.representative)
-    
+
     # check memory handling
     r = i.representative
     print r
     del i
     del index
     print r
-    
+
     index = seqan.IndexEsaDna5(sequences)
     i = index.TopDownIterator(index)
     j = index.TopDownIterator(index)

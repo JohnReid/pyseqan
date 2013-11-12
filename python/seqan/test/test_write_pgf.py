@@ -15,12 +15,11 @@ We're looking for something like:
     child { node {Problem Measures} }
     child { node {Problem Aspects} }
     ... % as before
-
 """
 
-from . import fasta_file
-
-import logging, seqan
+from seqan.test import fasta_file
+import logging
+import seqan
 from copy import copy
 
 
@@ -31,7 +30,7 @@ def test_write_pgf():
     #    s.remove('T')
     index = seqan.IndexEsaDna(sequences)
     suffix = 'GCCGAA'
-    
+
     def descend(i):
         indent = ' ' * 2 * len(i.representative)
         is_root = i.isRoot
@@ -44,7 +43,7 @@ def test_write_pgf():
         on_path = suffix[:shorter_length] == str(i.representative)[:shorter_length]
         last_node = suffix == str(i.representative)
         logging.info('%-10s : %5d : %5s %5s', str(i.representative)[:10], i.countOccurrences, on_path, past_end)
-        
+
         if not is_root:
             print >>tikz, '%schild {' % (indent)
         print >>tikz, '%snode[%s] {}' % (
@@ -52,7 +51,7 @@ def test_write_pgf():
             (on_path and not past_end) and (last_node and 'last node on path' or 'node on path') or 'node off path',
             #i.countOccurrences
         )
-    
+
         # only go further down if we are on the right path
         if on_path:
             if i.goDown():
@@ -65,9 +64,9 @@ def test_write_pgf():
                 indent, (on_path and not past_end) and 'edge on path' or 'edge off path', edgeLabel
             )
             print >>tikz, '%s}' % indent
-    
+
     with open('suffix-tree.tex', 'w') as tikz:
         tikz.write('\\')
         descend(index.TopDownIterator(index))
         print >>tikz, ';'
-    
+

@@ -11,7 +11,7 @@ import logging, sys
 
 def assert_eq(x1, x2):
     assert x1 == x2, '(%s) %s != %s (%s)' % (type(x1).__name__, x1, x2, type(x2).__name__)
-    
+
 
 def assert_ne(x1, x2):
     assert x1 != x2, '(%s) %s == %s (%s)' % (type(x1).__name__, x1, x2, type(x2).__name__)

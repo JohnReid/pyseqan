@@ -20,10 +20,9 @@ use-project /boost : $(BOOST_ROOT) ;
 #
 # Some paths
 #
-path-constant PROJECT_DIR           : . ;
-path-constant DOC_DIR               : ../docs/c++ ;
-path-constant RELEASE_INSTALL_DIR   : ../python/seqan/_release_build ;
-path-constant DEBUG_INSTALL_DIR     : ../python/seqan/_debug_build ;
+path-constant PACKAGE_DIR           : ../python/seqan ;
+path-constant RELEASE_INSTALL_DIR   : $(PACKAGE_DIR)/_release_build ;
+path-constant DEBUG_INSTALL_DIR     : $(PACKAGE_DIR)/_debug_build ;
 
 
 #
@@ -80,28 +79,6 @@ python-extension _seqan
 
 
 #
-# Python tests
-#
-#local PY_TEST_FILES = [ glob ../python/seqan/test/test_*.py ] ;
-#local PY_TESTS = $(PY_TEST_FILES:B) ;
-#for PY_TEST in $(PY_TESTS) {
-#    # create boost python test
-#    local target = py_$(PY_TEST) ;
-#    bpl-test $(target) : ../python/seqan/test/$(PY_TEST).py _seqan install ;
-#    explicit $(target) ;
-#}
-# alias for all tests
-#alias all_pytests : py_$(PY_TESTS) ;
-#explicit all_pytests ;
-
-
-#
-# All tests
-#
-#alias all_tests : all_pytests ;
-
-
-#
 # Installation
 #
 install install
@@ -123,7 +100,9 @@ local rule run-test ( test-name : sources + )
     testing.make-test run-pyd : $(sources) : : $(test-name) ;
 }
 
-
+#
+# Check registry code
+#
 python-extension test_registry_ext : src/module_test_registry.cpp ;
 run-test test-registry : bpl-tests/test_registry.py test_registry_ext ;
 

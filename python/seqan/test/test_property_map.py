@@ -6,9 +6,9 @@
 Test assigning properties to nodes.
 """
 
-from . import fasta_file
-
-import logging, seqan
+from seqan.test import fasta_file
+import logging
+import seqan
 from copy import copy
 
 def test_property_map():
@@ -17,7 +17,7 @@ def test_property_map():
     index = seqan.IndexEsaDna5(sequences)
     logging.info('Creating property map of length %d', len(index))
     property_map = [None] * (2 * len(index))
-    
+
     def set_properties(i):
         property_map[i.value.id] = i.representative, i.countOccurrences
         if i.goDown():
@@ -25,7 +25,7 @@ def test_property_map():
                 set_properties(copy(i)) 
                 if not i.goRight():
                     break
-                
+
     def show_properties(i):
         if len(i.representative) < 3:
             logging.info('%-2s : %5d', *property_map[i.value.id])
@@ -34,7 +34,7 @@ def test_property_map():
                     show_properties(copy(i)) 
                     if not i.goRight():
                         break
-                
+
     logging.info('Setting properties')
     set_properties(index.TopDownIterator(index))
     logging.info('Showing properties')

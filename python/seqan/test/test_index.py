@@ -7,7 +7,7 @@ Test building an index.
 """
 
 import seqan, sys, logging
-from . import fasta_file, show_shallow_tree
+from seqan.test import fasta_file, show_shallow_tree
 
 
 def test_empty_index():
