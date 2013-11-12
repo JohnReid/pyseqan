@@ -37,7 +37,7 @@ project pyseqan
         <include>.
         <include>include
         <include>$(BOOST_ROOT)
-        <include>$(BOOST_INDEXING_SUITE)
+        <include>boost-indexing-suite
         <variant>release:<define>MYRRH_DISABLE_ASSERTS
         #<variant>debug:<python-debugging>on
     : usage-requirements
