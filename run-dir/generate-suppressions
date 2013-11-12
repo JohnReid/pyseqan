@@ -1,6 +1,8 @@
 #!/bin/bash -e
 
-ARGS="--leak-check=full --error-limit=no --gen-suppressions=all"
+. ./setup
+
+ARGS="--leak-check=full --error-limit=no --suppressions=sequan-2.supp --gen-suppressions=all"
 VALGRIND="valgrind $ARGS"
 export PYSEQANDEBUG=1
 

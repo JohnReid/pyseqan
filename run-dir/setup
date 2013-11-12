@@ -1,3 +1,11 @@
-export PYTHONPATH=../python:$PYTHONPATH
-. ~/.dev_env
-. virtualenv/bin/activate
+. $HOME/.env_fns
+MYPROJECTS=$HOME/Dev
+
+#
+# Update environment variables
+#
+export PYTHONPATH
+eval $(update-env \
+    --py-pre ../python/ \
+    --py-pre $MYPROJECTS/Cookbook/python \
+)

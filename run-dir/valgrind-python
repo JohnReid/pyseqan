@@ -1,0 +1,5 @@
+#!/bin/bash -ex
+
+. ./setup
+export PYSEQANDEBUG=1
+valgrind --suppressions=seqan-2.supp python "$*"

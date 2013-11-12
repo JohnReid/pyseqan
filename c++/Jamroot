@@ -7,6 +7,16 @@ import doxygen ;
 import pch ;
 import python ;
 
+
+#
+# Set up boost
+#
+if ! "$(BOOST_ROOT)" {
+  path-constant BOOST_ROOT : [ modules.peek : BOOST_ROOT ] ;
+}
+use-project /boost : $(BOOST_ROOT) ;
+
+
 #
 # Some paths
 #
@@ -14,7 +24,6 @@ path-constant PROJECT_DIR           : . ;
 path-constant DOC_DIR               : ../docs/c++ ;
 path-constant RELEASE_INSTALL_DIR   : ../python/seqan/_release_build ;
 path-constant DEBUG_INSTALL_DIR     : ../python/seqan/_debug_build ;
-
 
 
 #
@@ -116,14 +125,22 @@ local rule run-test ( test-name : sources + )
 
 
 python-extension test_registry_ext : src/module_test_registry.cpp ;
-#explicit test_registry ;
-run-test test_registry : bpl-tests/test_registry.py test_registry_ext ;
-#bpl-test test_registry : bpl-tests/test_registry.py test_registry_ext ;
+run-test test-registry : bpl-tests/test_registry.py test_registry_ext ;
 
+#
+# Tests
+#
 TEST_REQS =
     <define>BOOST_TEST_DYN_LINK
     <define>BOOST_TEST_MAIN
     ;
+#
+# Fails at moment due to seqan bugs
+# http://trac.seqan.de/ticket/1121
+# http://trac.seqan.de/ticket/1122
+#
+unit-test test-small-index : src/test/small-index.cpp /site-config//rt : $(TEST_REQS) ;
+explicit test-small-index ;
+
 obj sandbox-range : sandbox/myrrh_boost_range.cpp myrrh//myrrh ;
 explicit sandbox-range ;
-

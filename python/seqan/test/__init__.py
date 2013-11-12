@@ -19,8 +19,8 @@ def init_env(f, level=logging.DEBUG):
 def append_to_path(d):
     logging.info('Appending to sys.path: %s', d)
     sys.path.append(d) # stempy
-    
-    
+
+
 def prepend_to_path(d):
     logging.info('Prepending to sys.path: %s', d)
     sys.path.insert(0, d) # stempy
@@ -29,8 +29,8 @@ def prepend_to_path(d):
 def log_path(level=logging.DEBUG):
     for d in sys.path:
         logging.log(level, 'PYTHONPATH: %s', d)
-        
-        
+
+
 def update_path_for_seqan():
     d = os.path.dirname(__file__)
 #    prepend_to_path(os.path.normpath(os.path.join(d, '..', '..', '..', '..', 'Infpy', 'python'))) # Infpy

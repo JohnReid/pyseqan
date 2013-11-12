@@ -6,12 +6,9 @@
 Test building an index.
 """
 
-from setup_environment import init_test_env, update_path_for_seqan, logging, fasta_file, log_path
-init_test_env(__file__, level=logging.INFO)
-update_path_for_seqan()
-log_path(logging.DEBUG)
-
-import os, sys, seqan
+from utils import fasta_file
+import seqan
+import logging
 from copy import copy
 
 num_bases, sequences, ids = seqan.readFastaDna5(fasta_file('dm01r.fasta'))
@@ -23,7 +20,7 @@ def descend(i):
         #1/0
         if i.goDown():
             while True:
-                descend(copy(i)) 
+                descend(copy(i))
                 if not i.goRight():
                     break
 

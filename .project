@@ -33,7 +33,7 @@
 	</natures>
 	<filteredResources>
 		<filter>
-			<id>1370460844556</id>
+			<id>1384263490905</id>
 			<name></name>
 			<type>30</type>
 			<matcher>
@@ -42,12 +42,21 @@
 			</matcher>
 		</filter>
 		<filter>
-			<id>1370460844558</id>
+			<id>1384263490910</id>
 			<name></name>
 			<type>30</type>
 			<matcher>
 				<id>org.eclipse.ui.ide.multiFilter</id>
 				<arguments>1.0-name-matches-false-false-bin</arguments>
+			</matcher>
+		</filter>
+		<filter>
+			<id>1384263490915</id>
+			<name></name>
+			<type>10</type>
+			<matcher>
+				<id>org.eclipse.ui.ide.multiFilter</id>
+				<arguments>1.0-name-matches-false-false-install-test-env</arguments>
 			</matcher>
 		</filter>
 		<filter>
