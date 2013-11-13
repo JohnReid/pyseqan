@@ -97,3 +97,20 @@ def test_iterator():
     j.goDownChar('C')
     assert j != i
     assert j.value == i.value
+
+
+def test_iterator():
+    """Test by-value initialisation"""
+    logging.info(sys._getframe().f_code.co_name)
+    _num_bases, sequences, _ids = seqan.readFastaDna5(fasta_file('dm01r.fasta'))
+    logging.info('Building index')
+    index = seqan.IndexEsaDna5(sequences)
+    i = index.TopDownIterator(index)
+    i.goDownChar('C')
+    val = i.value
+    j = index.TopDownIterator(index, val)
+    assert 'C' == j.representative
+
+    del index
+    logging.info(j.representative)
+

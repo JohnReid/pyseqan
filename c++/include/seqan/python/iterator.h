@@ -156,12 +156,20 @@ struct topdown_iterator_exposer {
             exposed_t
         > _class(
             "TopDownIterator",
-            "Wrapper for C++ SeqAn top down iterater.",
+            "Wrapper for C++ SeqAn top down iterator.",
             py::init< container_t & >(
                 py::arg( "index" ),
                 "Construct the iterator from the index."
             )[ py::with_custodian_and_ward< 1, 2 >() ]
         );
+        _class.def(
+            py::init< container_t &, vertex_t >(
+                (
+                    py::arg( "index" ),
+                    py::arg( "vertex" ),
+                ),
+                "Construct an iterator to the given vertex in the index."
+            )[ py::with_custodian_and_ward< 1, 2 >() ] );
         _class.add_property( "repLength", rep_length, "The length of the representative substring of this iterator." );
         _class.add_property( "representative", get_representative, "A representative substring of this iterator." );
         _class.add_property( "parentEdgeLength", parent_edge_length, "The length of the label of the edge from the parent node to this node." );
