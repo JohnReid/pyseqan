@@ -15,6 +15,6 @@ void
 expose_indexes() {
 	using namespace seqan;
     using namespace seqan::python;
-    index_exposer< StringSet< String< Dna  > > >::expose();
-    index_exposer< StringSet< String< Dna5 > > >::expose();
+    exposer< Index< StringSet< String< Dna  > > > >::expose();
+    exposer< Index< StringSet< String< Dna5 > > > >::expose();
 }

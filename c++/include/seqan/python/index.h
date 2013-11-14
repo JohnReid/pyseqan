@@ -65,14 +65,46 @@ struct _name< IndexWotd<> >
 } //namespace detail
 
 
+template< typename TSize >
+struct exposer< VertexEsa< TSize > >
+: myrrh::python::ensure_exposer< exposer< VertexEsa< TSize > > >
+{
+    typedef VertexEsa< TSize >              exposed_type;
+
+
+    static
+    bool
+    __eq__( exposed_type const & v, exposed_type const & w ) {
+        return _getId( v ) == _getId( w );
+    }
+
+
+    static
+    TSize
+    id( exposed_type const & v ) {
+        return _getId( v );
+    }
+
+
+    void
+    expose() {
+        py::class_< exposed_type > class_(
+            name< exposed_type >().c_str(),
+            "A vertex in an index.",
+            py::no_init
+        );
+        class_.add_property( "id", id, "The id of this vertex. Can be used as an index into a property map." );
+        class_.def( "__eq__", __eq__, "Tests equality." );
+        class_.def( "__hash__", id, "Hash function." );
+    }
+};
+
+
 /**
  * Index exposer.
  */
-template<
-    typename TText,
-    typename TSpec = typename DefaultIndexSpec< TText >::Type
->
-struct index_exposer {
+template< typename TText, typename TSpec >
+struct exposer< Index< TText, TSpec > > {
 
     typedef Index< TText, TSpec >                               exposed_type;
     typedef typename Value< TText >::Type                       string_t;
@@ -123,39 +155,6 @@ struct index_exposer {
 
 
     static
-    typename Size< exposed_type >::Type
-    id( vertex_t const & v ) {
-        return _getId( v );
-    }
-
-
-    static
-    bool
-    _vertex_eq( vertex_t const & v, vertex_t const & w ) {
-        return _getId( v ) == _getId( w );
-    }
-
-
-    struct vertex_exposer
-    : myrrh::python::ensure_exposer< vertex_exposer >
-    {
-        typedef vertex_t exposed_type;
-
-        void
-        expose() {
-            py::class_< exposed_type > vertex_class(
-                name< exposed_type >().c_str(),
-                "A vertex in an index.",
-                py::no_init
-            );
-            vertex_class.add_property( "id", id, "The id of this vertex. Can be used as an index into a property map." );
-            vertex_class.def( "__eq__", _vertex_eq, "Tests equality." );
-            vertex_class.def( "__hash__", id, "Hash function." );
-        }
-    };
-
-
-    static
     void
     expose() {
 
@@ -175,8 +174,8 @@ struct index_exposer {
         _class.def( "__len__", __len__, "The length of the index." );
 
         iterator_exposer< top_down_it >().ensure_exposed_and_add_as_attr( _class, "TopDownIterator" );
-        infix_exposer< TText const >().ensure_exposed_and_add_as_attr( _class, "Infix" );
-        vertex_exposer().ensure_exposed_and_add_as_attr( _class, "Vertex" );
+        exposer< sa_infix_t >().ensure_exposed_and_add_as_attr( _class, "Infix" );
+        exposer< vertex_t >().ensure_exposed_and_add_as_attr( _class, "Vertex" );
     }
 };
 

@@ -64,6 +64,14 @@ def test_string_comparison():
         check_comparisons_both_ways(str_type_1, str_type_2)
 
 
+def test_string_infixes():
+    logging.info(sys._getframe().f_code.co_name)
+    s1 = seqan.StringDna('ACGTACGTACGT')
+    s2 = seqan.StringDna('TACGTACGTACG')
+    assert 'ACGT' == s1[0:4]
+    assert 'ACGT' == str(s2[1:5])
+
+
 def test_string_infix_types_different():
     logging.info(sys._getframe().f_code.co_name)
     # check types are different

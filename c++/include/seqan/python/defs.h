@@ -39,6 +39,20 @@ set_index_error() {
 }
 
 
+/** Expose a seqan type. */
+template< typename Exposed >
+struct exposer {
+    static
+    void
+    expose() {
+        throw std::logic_error(
+            MYRRH_MAKE_STRING(
+                "exposer<> is not specialized for "
+                << typeid( Exposed ).name() ) );
+    }
+};
+
+
 } // namespace python
 } // namespace seqan
 

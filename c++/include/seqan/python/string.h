@@ -144,9 +144,9 @@ read_fasta( const char * fasta_filename, bool reverse ) {
 /**
  * String exposer.
  */
-template< typename TValue, typename TSpec = Alloc<> >
-struct string_exposer
-: myrrh::python::ensure_exposer< string_exposer< TValue, TSpec > >
+template< typename TValue, typename TSpec >
+struct exposer< String< TValue, TSpec > >
+: myrrh::python::ensure_exposer< exposer< String< TValue, TSpec > > >
 {
 
     typedef String< TValue, TSpec > exposed_type;
@@ -205,7 +205,7 @@ struct string_exposer
 
         expose_string_conversions( _class, typename detail::is_char_convertible< TValue >::Type() );
 
-        infix_exposer< exposed_type >().ensure_exposed_and_add_as_attr( _class, "Infix" );
+        exposer< infix_t >().ensure_exposed_and_add_as_attr( _class, "Infix" );
         simple_type_exposer< TValue >().ensure_exposed_and_add_as_attr( _class, "Value" );
     }
 };
@@ -216,10 +216,10 @@ struct string_exposer
 /**
  * StringSet exposer.
  */
-template< typename TString, typename TSpec = Owner< Generous > >
-struct string_set_exposer
+template< typename TString, typename TSpec >
+struct exposer< StringSet< TString, TSpec > >
 {
-    typedef StringSet< TString > exposed_t;
+    typedef StringSet< TString, TSpec > exposed_type;
     typedef typename Value< TString >::Type string_value_t;
 
     static
@@ -227,20 +227,20 @@ struct string_set_exposer
     expose() {
         py::def(
             MYRRH_MAKE_STRING( "readFasta" << name< string_value_t >() ).c_str(),
-            read_fasta< exposed_t >,
+            read_fasta< exposed_type >,
             ( py::arg( "fasta_filename" ), py::arg( "reverse" )=false ),
             "Read a FASTA file into a seqan string set."
         );
 
         py::class_<
-            exposed_t,
-            boost::shared_ptr< exposed_t >,
+            exposed_type,
+            boost::shared_ptr< exposed_type >,
             boost::noncopyable
         > _class(
-            name< exposed_t >().c_str(),
+            name< exposed_type >().c_str(),
             "Wrapper for SeqAn C++ string set."
         );
-        container_exposer< exposed_t >::expose( _class );
+        container_exposer< exposed_type >::expose( _class );
     }
 
 };
@@ -251,17 +251,14 @@ struct string_set_exposer
  */
 template<
     typename TValue,
-    typename TStringSpec = Alloc<>,
-    typename TSetSpec = Owner< Generous >
+    typename TStringSpec = Alloc<>
 >
 void
 expose_string_functionality()
 {
     typedef String< TValue, TStringSpec > string_t;
-    typedef StringSet< string_t > string_set_t;
-
-    string_exposer< TValue, TStringSpec >::expose();
-    string_set_exposer< string_t, TSetSpec >::expose();
+    exposer< string_t >::expose();
+    exposer< StringSet< string_t > >::expose();
 }
 
 

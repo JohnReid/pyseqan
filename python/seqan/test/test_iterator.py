@@ -108,7 +108,9 @@ def test_get_occurrences():
     index = _build_index()
     i = index.TopDownIterator(index)
     i.goDownChar('C')
-    for occ in i.occurrences:
+    occs = i.occurrences
+    print type(occs)
+    for occ in occs:
         print occ
 
 

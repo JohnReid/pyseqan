@@ -260,7 +260,8 @@ struct iterator_exposer
         _class.def( "goRight", go_right, "Iterates to the next sibling in a tree." );
         _class.def( "__copy__", __copy__, "Returns a copy of this iterator." );
 
-        string_exposer< sa_infix_t >().ensure_exposed_and_add_as_attr( _class, "Occurrences" );
+        exposer< infix_t >().ensure_exposed_and_add_as_attr( _class, "Representative" );
+        exposer< sa_infix_t >().ensure_exposed_and_add_as_attr( _class, "Occurrences" );
     }
 };
 

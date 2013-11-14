@@ -70,13 +70,27 @@ string_notequals( TString const & str, py::object obj ) {
 
 
 
-template< typename TString >
-struct infix_exposer
-: myrrh::python::ensure_exposer< infix_exposer< TString > >
+template< typename THost, typename TSpec >
+struct exposer< Segment< THost, TSpec > >
+: myrrh::python::ensure_exposer< exposer< Segment< THost, TSpec > > >
 {
+    typedef Segment< THost, TSpec >                 exposed_type;
+    typedef typename Value< exposed_type >::Type    value_type;
 
-    typedef typename seqan::Infix< TString >::Type exposed_type;
-    typedef typename Value< exposed_type >::Type value_type;
+    /** Expose string conversions if value is suitable. */
+    template< typename Class >
+    static
+    void
+    expose_string_conversions( Class & _class, seqan::False && ) {
+    }
+
+    /** Expose string conversions if value is suitable. */
+    template< typename Class >
+    static
+    void
+    expose_string_conversions( Class & _class, seqan::True && ) {
+        _class.def( "__str__", std_string_from_seqan< exposed_type >, "String representation." );
+    }
 
     void
     expose() {
@@ -85,7 +99,7 @@ struct infix_exposer
             "Infix of string."
         );
         const_container_exposer< exposed_type >::expose( _class );
-        //_class.def( "__str__", std_string_from_seqan< exposed_type >, "String representation." );
+        expose_string_conversions( _class, typename detail::is_char_convertible< value_type >::Type() );
         _class.def( "__getitem__", __getitem__< exposed_type >, "Get individual value or a slice. No support for irregular step sizes.", py::with_custodian_and_ward_postcall< 0, 1 >() );
         _class.def( "__eq__", string_equals< exposed_type > );
         _class.def( "__ne__", string_notequals< exposed_type > );
