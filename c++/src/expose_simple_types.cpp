@@ -15,8 +15,8 @@ void
 expose_simple_types() {
 	using namespace seqan;
     using namespace seqan::python;
-    simple_type_exposer< Dna >::expose();
-    simple_type_exposer< Dna5 >::expose();
+    exposer< Dna >::expose();
+    exposer< Dna5 >::expose();
 //    simple_type_exposer< Rna >::expose();
 //    simple_type_exposer< Rna5 >::expose();
 //    simple_type_exposer< Iupac >::expose();

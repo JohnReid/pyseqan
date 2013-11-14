@@ -38,11 +38,44 @@ struct is_char_convertible< SimpleType< TValue, TSpec > > {
 /**
  * Simple type exposer.
  */
-template< typename Exposed >
-struct simple_type_exposer
-: myrrh::python::ensure_exposer< simple_type_exposer< Exposed > >
+template< typename T1, typename T2, typename TSpec >
+struct exposer< Pair< T1, T2, TSpec > >
+: myrrh::python::ensure_exposer< exposer< Pair< T1, T2, TSpec > > >
 {
-    typedef Exposed exposed_type;
+    typedef Pair< T1, T2, TSpec > exposed_type;
+
+
+    static
+    std::string
+    __str__( exposed_type const & x ) {
+        return MYRRH_MAKE_STRING( "Pair<" << x.i1 << "," << x.i2 << ">" );
+    }
+
+    static
+    void
+    expose() {
+        py::class_< exposed_type > _class(
+            name< exposed_type >().c_str(),
+            "Wrapper for SeqAn Pair."
+        );
+
+        _class.def( "__str__", __str__, "A string representation." );
+        _class.def_readwrite( "i1", &exposed_type::i1 );
+        _class.def_readwrite( "i2", &exposed_type::i2 );
+    }
+
+
+};
+
+
+/**
+ * Simple type exposer.
+ */
+template< typename TValue, typename TSpec >
+struct exposer< SimpleType< TValue, TSpec > >
+: myrrh::python::ensure_exposer< exposer< SimpleType< TValue, TSpec > > >
+{
+    typedef SimpleType< TValue, TSpec > exposed_type;
 
     static
     exposed_type
@@ -75,6 +108,7 @@ struct simple_type_exposer
         py::implicitly_convertible< char, exposed_type >();
     }
 
+
     static
     void
     expose() {
@@ -88,6 +122,7 @@ struct simple_type_exposer
 
         expose_string_conversions( _class, typename detail::is_char_convertible< exposed_type >::Type() );
     }
+
 
     static
     exposed_type *
@@ -164,39 +199,6 @@ struct simple_type_exposer
 
 };
 
-
-#if 0
-/**
- * Expose if it is a simple type.
- */
-template< typename Exposed, class Enable=void >
-struct
-expose_if_simple {
-    void
-    operator()( boost::python::scope &, const char * ) {
-    }
-};
-
-
-/**
- * Expose if it is a simple type.
- */
-template< typename Exposed >
-struct
-expose_if_simple<
-    Exposed,
-    typename boost::enable_if<
-        typename detail::seqan_true_false_to_boost<
-            typename IsSimple< Exposed >::Type
-        >::type
-    >::type
-> {
-    void
-    operator()( boost::python::scope & scope, const char * name ) {
-        simple_type_exposer< Exposed >().ensure_exposed_and_add_as_attr( scope, name );
-    }
-};
-#endif
 
 } // namespace python
 } // namespace seqan

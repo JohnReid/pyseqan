@@ -5,16 +5,13 @@
  *
  */
 
-#ifndef PYSEQAN_INFIX_JR_4JUN2013_
-#define PYSEQAN_INFIX_JR_4JUN2013_
+#ifndef PYSEQAN_SEGMENT_JR_4JUN2013_
+#define PYSEQAN_SEGMENT_JR_4JUN2013_
 
 #include <seqan/python/defs.h>
 #include <seqan/python/simple_type.h>
 #include <seqan/python/names.h>
 #include <seqan/python/container.h>
-
-
-
 
 
 namespace seqan {
@@ -104,11 +101,12 @@ struct exposer< Segment< THost, TSpec > >
         _class.def( "__eq__", string_equals< exposed_type > );
         _class.def( "__ne__", string_notequals< exposed_type > );
 
-        simple_type_exposer< value_type >().ensure_exposed_and_add_as_attr( _class, "Value" );
+        exposer< value_type >().ensure_exposed_and_add_as_attr( _class, "Value" );
     }
 };
+
 
 } //namespace python
 } //namespace seqan
 
-#endif //PYSEQAN_INFIX_JR_4JUN2013_
+#endif //PYSEQAN_SEGMENT_JR_4JUN2013_

@@ -11,7 +11,7 @@
 #include <seqan/python/defs.h>
 #include <seqan/python/iterator.h>
 #include <seqan/python/string.h>
-#include <seqan/python/infix.h>
+#include <seqan/python/segment.h>
 #include <seqan/index.h>
 
 

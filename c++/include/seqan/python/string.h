@@ -12,7 +12,7 @@
 #include <seqan/python/container.h>
 #include <seqan/python/simple_type.h>
 #include <seqan/python/names.h>
-#include <seqan/python/infix.h>
+#include <seqan/python/segment.h>
 #include <seqan/sequence.h>
 
 
@@ -206,7 +206,7 @@ struct exposer< String< TValue, TSpec > >
         expose_string_conversions( _class, typename detail::is_char_convertible< TValue >::Type() );
 
         exposer< infix_t >().ensure_exposed_and_add_as_attr( _class, "Infix" );
-        simple_type_exposer< TValue >().ensure_exposed_and_add_as_attr( _class, "Value" );
+        exposer< TValue >().ensure_exposed_and_add_as_attr( _class, "Value" );
     }
 };
 
