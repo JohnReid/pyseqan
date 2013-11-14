@@ -10,8 +10,8 @@
 
 #include <seqan/python/defs.h>
 #include <seqan/python/iterator.h>
+#include <seqan/python/string.h>
 #include <seqan/python/infix.h>
-
 #include <seqan/index.h>
 
 
@@ -19,41 +19,50 @@
 
 namespace seqan {
 namespace python {
+namespace detail {
 
 
-/**
- * Meta-function to produce correct name for an index specialisation.
- */
-template< typename TSpec >
-struct _index_spec_name  {
+/// Specialisation for vertex
+template< typename T >
+struct _name< VertexEsa< T > >
+{
+    std::string operator()() const {
+        return MYRRH_MAKE_STRING( "VertexEsa" );
+    }
 };
 
-/// Specialisation of meta-function to produce correct name for an index specialisation.
-//template<>
-//struct _index_spec_name< IndexSa<> > {
-//    const char * operator()() { return "Sa"; }
-//};
 
-/// Specialisation of meta-function to produce correct name for an index specialisation.
+/// Specialisation for index
+template< typename TText, typename TSpec >
+struct _name< Index< TText, TSpec > >
+{
+    std::string operator()() const {
+        return MYRRH_MAKE_STRING( "Index" << name< TText >() << name< TSpec >() );
+    }
+};
+
+
+/// Specialisation for ESA
 template<>
-struct _index_spec_name< IndexEsa<> > {
-    const char * operator()() { return "Esa"; }
+struct _name< IndexEsa<> >
+{
+    std::string operator()() const {
+        return "ESA";
+    }
 };
 
-/// Specialisation of meta-function to produce correct name for an index specialisation.
+
+/// Specialisation for Wotd
 template<>
-struct _index_spec_name< IndexWotd<> > {
-    const char * operator()() { return "Wotd"; }
+struct _name< IndexWotd<> >
+{
+    std::string operator()() const {
+        return "WOTD";
+    }
 };
 
-template< typename Index >
-const char *
-index_spec_name() {
-    return _index_spec_name< typename Spec< Index >::Type >()();
-}
 
-
-
+} //namespace detail
 
 
 /**
@@ -65,10 +74,14 @@ template<
 >
 struct index_exposer {
 
-    typedef Index< TText, TSpec > exposed_t;
-    typedef typename Value< TText >::Type string_t;
-    typedef typename Value< string_t >::Type alphabet_t;
-    typedef typename VertexDescriptor< exposed_t >::Type vertex_t;
+    typedef Index< TText, TSpec >                               exposed_type;
+    typedef typename Value< TText >::Type                       string_t;
+    typedef typename Value< string_t >::Type                    alphabet_t;
+    typedef typename VertexDescriptor< exposed_type >::Type     vertex_t;
+    typedef typename Fibre< exposed_type, EsaSA >::Type         sa_fibre_t;
+    typedef typename Infix< sa_fibre_t const >::Type            sa_infix_t;
+    typedef typename Value< sa_infix_t >::Type                  sa_value_t;
+    typedef typename Iterator< exposed_type, TopDown<> >::Type  top_down_it;
 
 
     /**
@@ -88,12 +101,13 @@ struct index_exposer {
 
 
     /**
-     * Visit all the nodes in the index. This can be useful to build a suffix tree ahead of doing any timings.
+     * Visit all the nodes in the index. This can be useful to build a suffix
+     * tree ahead of doing any timings.
      */
     static
     void
-    visit_tree( exposed_t & index ) {
-        typename Iterator< exposed_t, TopDown<> >::Type root( index );
+    visit_tree( exposed_type & index ) {
+        top_down_it root( index );
         visit_node( root );
     }
 
@@ -102,14 +116,14 @@ struct index_exposer {
      * The length of the index.
      */
     static
-    typename Size< exposed_t >::Type
-    __len__( exposed_t const & index ) {
+    typename Size< exposed_type >::Type
+    __len__( exposed_type const & index ) {
         return length( index );
     }
 
 
     static
-    typename Size< exposed_t >::Type
+    typename Size< exposed_type >::Type
     id( vertex_t const & v ) {
         return _getId( v );
     }
@@ -122,34 +136,22 @@ struct index_exposer {
     }
 
 
-    struct top_down_exposer
-    : myrrh::python::expose_or_set_attribute< top_down_exposer >
-    {
-    	typedef typename Iterator< exposed_t, TopDown<> >::Type exposed_type;
-
-    	void
-    	expose( const char * name ) {
-    		topdown_iterator_exposer< exposed_type >::expose( name );
-    	}
-    };
-
-
     struct vertex_exposer
-    : myrrh::python::expose_or_set_attribute< vertex_exposer >
+    : myrrh::python::ensure_exposer< vertex_exposer >
     {
-    	typedef vertex_t exposed_type;
+        typedef vertex_t exposed_type;
 
-    	void
-    	expose( const char * name ) {
-			py::class_< exposed_type > vertex_class(
-				name,
-				"A vertex in an index.",
-				py::no_init
-			);
-			vertex_class.add_property( "id", id, "The id of this vertex. Can be used as an index into a property map." );
-			vertex_class.def( "__eq__", _vertex_eq, "Tests equality." );
-			vertex_class.def( "__hash__", id, "Hash function." );
-    	}
+        void
+        expose() {
+            py::class_< exposed_type > vertex_class(
+                name< exposed_type >().c_str(),
+                "A vertex in an index.",
+                py::no_init
+            );
+            vertex_class.add_property( "id", id, "The id of this vertex. Can be used as an index into a property map." );
+            vertex_class.def( "__eq__", _vertex_eq, "Tests equality." );
+            vertex_class.def( "__hash__", id, "Hash function." );
+        }
     };
 
 
@@ -158,24 +160,23 @@ struct index_exposer {
     expose() {
 
         py::class_<
-            exposed_t,
-            boost::shared_ptr< exposed_t >,
+            exposed_type,
+            boost::shared_ptr< exposed_type >,
             boost::noncopyable
         > _class(
-            MYRRH_MAKE_STRING( "Index" << index_spec_name< exposed_t >() << simple_type_name< alphabet_t >() ).c_str(),
+            name< exposed_type >().c_str(),
             "Wrapper for C++ seqan index.",
             py::init< TText const & >(
-				py::arg( "index" ),
-				"Construct an index from the text."
-			)[ py::with_custodian_and_ward< 1, 2 >() ]
+                py::arg( "index" ),
+                "Construct an index from the text."
+            )[ py::with_custodian_and_ward< 1, 2 >() ]
         );
         _class.def( "visit", visit_tree, "Visit all the nodes in a tree. This can be useful to build the suffix tree ahead of doing any timings." );
         _class.def( "__len__", __len__, "The length of the index." );
 
-		py::scope scope( _class );
-		top_down_exposer()( scope, "TopDownIterator" );
-		infix_exposer< TText const >()( scope, "Infix" );
-		vertex_exposer()( scope, "Vertex" );
+        iterator_exposer< top_down_it >().ensure_exposed_and_add_as_attr( _class, "TopDownIterator" );
+        infix_exposer< TText const >().ensure_exposed_and_add_as_attr( _class, "Infix" );
+        vertex_exposer().ensure_exposed_and_add_as_attr( _class, "Vertex" );
     }
 };
 

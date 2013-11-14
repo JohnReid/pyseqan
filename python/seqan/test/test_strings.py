@@ -12,12 +12,6 @@ import seqan
 import sys
 from itertools import combinations
 
-def test_inspect_string():
-    logging.info(sys._getframe().f_code.co_name)
-    mystr = 'ACGTACGTACGTNNN'
-    seqan.check_string_conversion(seqan.StringDna5(mystr))
-    seqan.check_string_conversion(mystr)
-
 
 def infix_maker(str_type):
     def make_infix(s):

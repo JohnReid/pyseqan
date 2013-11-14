@@ -22,5 +22,5 @@ def descend(i):
 
 def test_build_index():
     _num_bases, sequences, _ids = seqan.readFastaDna5(fasta_file('dm01r.fasta'))
-    index = seqan.IndexEsaDna5(sequences)
+    index = seqan.IndexStringDna5SetESA(sequences)
     descend(index.TopDownIterator(index))

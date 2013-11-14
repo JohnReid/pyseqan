@@ -28,7 +28,7 @@ def test_write_pgf():
     _num_bases, sequences, _ids = seqan.readFastaDna(fasta_file('dm01r.fasta'))
     #for s in sequences:
     #    s.remove('T')
-    index = seqan.IndexEsaDna(sequences)
+    index = seqan.IndexStringDnaSetESA(sequences)
     suffix = 'GCCGAA'
 
     def descend(i):

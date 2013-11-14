@@ -18,7 +18,7 @@ def _make_test_index():
     strings.appendValue(seqan.StringDna5('ACG'))
     strings.appendValue(seqan.StringDna5('AA'))
     strings.appendValue(seqan.StringDna5('NN'))
-    return seqan.IndexEsaDna5(strings)
+    return seqan.IndexStringDna5SetESA(strings)
 
 
 def test_representative_equality():
@@ -58,12 +58,15 @@ def test_go_down_str():
     check_go_down_str(copy(i), seqan.StringDna5('AC' ), 'ACG')
 
 
+def _build_index():
+    _num_bases, sequences, _ids = seqan.readFastaDna5(fasta_file('dm01r.fasta'))
+    logging.info('Building index')
+    return seqan.IndexStringDna5SetESA(sequences)
+
 
 def test_iterator():
     logging.info(sys._getframe().f_code.co_name)
-    _num_bases, sequences, _ids = seqan.readFastaDna5(fasta_file('dm01r.fasta'))
-    logging.info('Building index')
-    index = seqan.IndexEsaDna5(sequences)
+    index = _build_index()
 
     i = index.TopDownIterator(index)
     assert not i.representative
@@ -86,7 +89,7 @@ def test_iterator():
     del index
     print r
 
-    index = seqan.IndexEsaDna5(sequences)
+    index = _build_index()
     i = index.TopDownIterator(index)
     j = index.TopDownIterator(index)
     assert j != i
@@ -99,12 +102,20 @@ def test_iterator():
     assert j.value == i.value
 
 
-def test_iterator():
+def test_get_occurrences():
+    """Test getting iterator occurrences"""
+    logging.info(sys._getframe().f_code.co_name)
+    index = _build_index()
+    i = index.TopDownIterator(index)
+    i.goDownChar('C')
+    for occ in i.occurrences:
+        print occ
+
+
+def test_by_value_init():
     """Test by-value initialisation"""
     logging.info(sys._getframe().f_code.co_name)
-    _num_bases, sequences, _ids = seqan.readFastaDna5(fasta_file('dm01r.fasta'))
-    logging.info('Building index')
-    index = seqan.IndexEsaDna5(sequences)
+    index = _build_index()
     i = index.TopDownIterator(index)
     i.goDownChar('C')
     val = i.value
@@ -114,3 +125,6 @@ def test_iterator():
     del index
     logging.info(j.representative)
 
+
+if '__main__' == __name__:
+    test_get_occurrences()

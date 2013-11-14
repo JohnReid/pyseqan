@@ -5,107 +5,83 @@
  *
  */
 
-#ifndef PYSEQAN_STRING_JR_14FEB2013_DEFS_H_
-#define PYSEQAN_STRING_JR_14FEB2013_DEFS_H_
+#ifndef PYSEQAN_STRING_JR_14FEB2013_
+#define PYSEQAN_STRING_JR_14FEB2013_
 
 #include <seqan/python/defs.h>
 #include <seqan/python/container.h>
 #include <seqan/python/simple_type.h>
+#include <seqan/python/names.h>
 #include <seqan/python/infix.h>
-
 #include <seqan/sequence.h>
-
-
-
 
 
 namespace seqan {
 namespace python {
+namespace detail {
 
 
-
-/**
- * String exposer.
- */
-template< typename TValue, typename TSpec = Alloc<> >
-struct string_exposer
+/// Specialisation for seqan string
+template< typename TValue, typename TSpec >
+struct _name< String< TValue, TSpec >, void >
 {
-
-    typedef String< TValue, TSpec > exposed_t;
-    typedef typename Position< exposed_t >::Type position_t;
-    typedef typename Infix< exposed_t >::Type infix_t;
-
-    static
-    infix_t
-    _infix( exposed_t & _self, position_t begin, position_t end ) {
-        if( begin < 0 ) {
-            throw std::invalid_argument( "Begin before start of string." );
-        }
-        if( end > length( _self ) ) {
-            throw std::invalid_argument( "End too large." );
-        }
-        return infix( _self, begin, end );
-    }
-
-    static
-    void
-    expose() {
-		py::class_<
-			exposed_t,
-			boost::shared_ptr< exposed_t >,
-			boost::noncopyable
-		> _class(
-			MYRRH_MAKE_STRING( "String" << simple_type_name< TValue >() ).c_str(),
-			"Wrapper for SeqAn C++ string.",
-			py::init< std::string const & >(
-				py::arg( "x" ),
-				"Construct a SeqAn string from the python string, x."
-			)
-		);
-        container_exposer< exposed_t >::expose( _class );
-        _class.def( "__str__", std_string_from_seqan< exposed_t >, "String representation." );
-        _class.def( "__getitem__", __getitem__< exposed_t >, "Get individual value or a slice. No support for irregular step sizes.", py::with_custodian_and_ward_postcall< 0, 1 >() );
-        _class.def( "infix", _infix, "Infix of the string.", py::with_custodian_and_ward_postcall< 0, 1 >() );
-        _class.def( "__eq__", string_equals< exposed_t > );
-        _class.def( "__ne__", string_notequals< exposed_t > );
-
-        py::implicitly_convertible< std::string, exposed_t >();
-
-        py::scope scope( _class );
-        infix_exposer< exposed_t >()( scope, "Infix" );
-        simple_type_exposer< TValue >()( scope, "Value" );
+    std::string operator()() const {
+        return MYRRH_MAKE_STRING( "String" << name< TValue >() );
     }
 };
 
 
-
-
-/**
- * StringSet exposer.
- */
-template< typename TString, typename TSpec = Owner< Generous > >
-struct string_set_exposer
+/// Specialisation for seqan segment
+template< typename THost, typename TSpec >
+struct _name< Segment< THost, TSpec >, void >
 {
-    typedef StringSet< TString > exposed_t;
-    typedef typename Value< TString >::Type string_value_t;
-
-    static
-    void
-    expose() {
-        py::class_<
-            exposed_t,
-            boost::shared_ptr< exposed_t >,
-            boost::noncopyable
-        > _class(
-            MYRRH_MAKE_STRING( "String" << simple_type_name< string_value_t >() << "Set" ).c_str(),
-            "Wrapper for SeqAn C++ string set."
-        );
-        container_exposer< exposed_t >::expose( _class );
+    std::string operator()() const {
+        return MYRRH_MAKE_STRING( "" << name< THost >() << name< TSpec >() );
     }
-
 };
 
 
+/// Specialisation for infix
+template<>
+struct _name< InfixSegment, void >
+{
+    std::string operator()() const {
+        return "Infix";
+    }
+};
+
+
+/// Specialisation for suffix
+template<>
+struct _name< SuffixSegment, void >
+{
+    std::string operator()() const {
+        return "Suffix";
+    }
+};
+
+
+/// Specialisation for postfix
+template<>
+struct _name< PrefixSegment, void >
+{
+    std::string operator()() const {
+        return "Prefix";
+    }
+};
+
+
+/// Specialisation for seqan string set
+template< typename TString, typename TSpec >
+struct _name< StringSet< TString, TSpec >, void >
+{
+    std::string operator()() const {
+        return MYRRH_MAKE_STRING( name< TString >() << "Set" );
+    }
+};
+
+
+} // namespace detail
 
 
 /**
@@ -136,9 +112,9 @@ read_fasta_(
             assign( tmp_meta, meta );
             ids.push_back( tmp_meta );
             if( Reverse ) {
-            	appendValue( sequences, seqan::ModifiedString< TString, seqan::ModReverse >( str ) );
+                appendValue( sequences, seqan::ModifiedString< TString, seqan::ModReverse >( str ) );
             } else {
-            	appendValue( sequences, str );
+                appendValue( sequences, str );
             }
         }
         //std::cout << "Read " << length( sequences ) << " sequences with a total of " << num_bases << " bases\n";
@@ -146,7 +122,6 @@ read_fasta_(
     }
     return num_bases;
 }
-
 
 
 /**
@@ -158,16 +133,117 @@ read_fasta( const char * fasta_filename, bool reverse ) {
     boost::shared_ptr< string_vector > ids( new string_vector );
     boost::shared_ptr< TStringSet > sequences( new TStringSet );
     const size_t num_bases =
-		reverse
-			? read_fasta_< true  >( fasta_filename, *sequences, *ids )
-			: read_fasta_< false >( fasta_filename, *sequences, *ids )
-		    ;
+        reverse
+            ? read_fasta_< true  >( fasta_filename, *sequences, *ids )
+            : read_fasta_< false >( fasta_filename, *sequences, *ids )
+            ;
     return boost::python::make_tuple( num_bases, sequences, ids );
 }
 
 
+/**
+ * String exposer.
+ */
+template< typename TValue, typename TSpec = Alloc<> >
+struct string_exposer
+: myrrh::python::ensure_exposer< string_exposer< TValue, TSpec > >
+{
+
+    typedef String< TValue, TSpec > exposed_type;
+    typedef typename Position< exposed_type >::Type position_t;
+    typedef typename Infix< exposed_type >::Type infix_t;
+
+    static
+    infix_t
+    _infix( exposed_type & _self, position_t begin, position_t end ) {
+        if( begin < 0 ) {
+            throw std::invalid_argument( "Begin before start of string." );
+        }
+        if( end > length( _self ) ) {
+            throw std::invalid_argument( "End too large." );
+        }
+        return infix( _self, begin, end );
+    }
+
+    /** Expose string conversions if value is suitable. */
+    template< typename Class >
+    static
+    void
+    expose_string_conversions( Class & _class, seqan::False && ) {
+    }
+
+    /** Expose string conversions if value is suitable. */
+    template< typename Class >
+    static
+    void
+    expose_string_conversions( Class & _class, seqan::True && ) {
+        _class.def(
+            py::init< std::string const & >(
+                py::arg( "x" ),
+                "Construct a SeqAn string from the python string, x." ));
+        _class.def( "__str__", std_string_from_seqan< exposed_type >, "String representation." );
+        py::implicitly_convertible< std::string, exposed_type >();
+    }
+
+    static
+    void
+    expose() {
+        //std::cout << "Registering: " << name< exposed_type >() << " : " << typeid( exposed_type ).name() << "\n";
+        py::class_<
+            exposed_type,
+            boost::shared_ptr< exposed_type >,
+            boost::noncopyable
+        > _class(
+            name< exposed_type >().c_str(),
+            "Wrapper for SeqAn C++ string."
+        );
+        container_exposer< exposed_type >::expose( _class );
+        _class.def( "__getitem__", __getitem__< exposed_type >, "Get individual value or a slice. No support for irregular step sizes.", py::with_custodian_and_ward_postcall< 0, 1 >() );
+        _class.def( "infix", _infix, "Infix of the string.", py::with_custodian_and_ward_postcall< 0, 1 >() );
+        _class.def( "__eq__", string_equals< exposed_type > );
+        _class.def( "__ne__", string_notequals< exposed_type > );
+
+        expose_string_conversions( _class, typename detail::is_char_convertible< TValue >::Type() );
+
+        infix_exposer< exposed_type >().ensure_exposed_and_add_as_attr( _class, "Infix" );
+        simple_type_exposer< TValue >().ensure_exposed_and_add_as_attr( _class, "Value" );
+    }
+};
 
 
+
+
+/**
+ * StringSet exposer.
+ */
+template< typename TString, typename TSpec = Owner< Generous > >
+struct string_set_exposer
+{
+    typedef StringSet< TString > exposed_t;
+    typedef typename Value< TString >::Type string_value_t;
+
+    static
+    void
+    expose() {
+        py::def(
+            MYRRH_MAKE_STRING( "readFasta" << name< string_value_t >() ).c_str(),
+            read_fasta< exposed_t >,
+            ( py::arg( "fasta_filename" ), py::arg( "reverse" )=false ),
+            "Read a FASTA file into a seqan string set."
+        );
+
+        py::class_<
+            exposed_t,
+            boost::shared_ptr< exposed_t >,
+            boost::noncopyable
+        > _class(
+            name< exposed_t >().c_str(),
+            "Wrapper for SeqAn C++ string set."
+        );
+        container_exposer< exposed_t >::expose( _class );
+    }
+
+};
 
 
 /**
@@ -184,18 +260,13 @@ expose_string_functionality()
     typedef String< TValue, TStringSpec > string_t;
     typedef StringSet< string_t > string_set_t;
 
-    //register_seqan_string_to_python< typename Infix< string_t >::Type >();
     string_exposer< TValue, TStringSpec >::expose();
     string_set_exposer< string_t, TSetSpec >::expose();
-    boost::python::def(
-        MYRRH_MAKE_STRING( "readFasta" << simple_type_name< TValue >() ).c_str(),
-        read_fasta< string_set_t >,
-        ( py::arg( "fasta_filename" ), py::arg( "reverse" )=false ),
-        "Read a FASTA file into a seqan string set."
-    );
 }
+
 
 } // namespace python
 } // namespace seqan
 
-#endif //PYSEQAN_STRING_JR_14FEB2013_DEFS_H_
+
+#endif //PYSEQAN_STRING_JR_14FEB2013_

@@ -32,13 +32,13 @@ index_error() {
 template< typename Exposed >
 struct const_container_exposer {
 
-    typedef Exposed exposed_t;
-    typedef typename GetValue< exposed_t >::Type getvalue_t;
-    typedef typename Iterator< exposed_t >::Type iterator_t;
-    typedef typename Position< exposed_t >::Type position_t;
-    typedef typename Reference< exposed_t >::Type reference_t;
-    typedef typename Size< exposed_t >::Type size_t;
-    typedef typename Value< exposed_t >::Type value_t;
+    typedef Exposed exposed_type;
+    typedef typename GetValue< exposed_type >::Type getvalue_t;
+    typedef typename Iterator< exposed_type >::Type iterator_t;
+    typedef typename Position< exposed_type >::Type position_t;
+    typedef typename Reference< exposed_type >::Type reference_t;
+    typedef typename Size< exposed_type >::Type size_t;
+    typedef typename Value< exposed_type >::Type value_t;
 
     template< typename Class >
     static
@@ -53,39 +53,38 @@ struct const_container_exposer {
 
     static
     bool
-    _empty( exposed_t & _self ) {
+    _empty( exposed_type & _self ) {
         return empty( _self );
     }
 
     static
     bool
-    __nonzero__( exposed_t & _self ) {
+    __nonzero__( exposed_type & _self ) {
         return ! empty( _self );
     }
 
     static
-    typename Size< exposed_t >::Type
-    __len__( exposed_t const & _self ) {
+    typename Size< exposed_type >::Type
+    __len__( exposed_type const & _self ) {
         return length( _self );
     }
 
     static
     reference_t
-    _value( exposed_t & _self, position_t pos ) {
+    _value( exposed_type & _self, position_t pos ) {
         return value( _self, pos );
     }
 
     static
     reference_t
-    __getitem__( exposed_t & _self, position_t pos ) {
-    	if( pos >= length( _self ) ) {
-    		index_error();
-    		throw boost::python::error_already_set();
-    	} else {
-    		return value( _self, pos );
-    	}
+    __getitem__( exposed_type & _self, position_t pos ) {
+        if( pos >= length( _self ) ) {
+            index_error();
+            throw boost::python::error_already_set();
+        } else {
+            return value( _self, pos );
+        }
     }
-
 };
 
 
@@ -96,35 +95,34 @@ struct const_container_exposer {
 template< typename Exposed >
 struct container_exposer {
 
-    typedef Exposed exposed_t;
-    typedef typename GetValue< exposed_t >::Type getvalue_t;
-    typedef typename Iterator< exposed_t >::Type iterator_t;
-    typedef typename Position< exposed_t >::Type position_t;
-    typedef typename Reference< exposed_t >::Type reference_t;
-    typedef typename Size< exposed_t >::Type size_t;
-    typedef typename Value< exposed_t >::Type value_t;
+    typedef Exposed exposed_type;
+    typedef typename GetValue< exposed_type >::Type   getvalue_t;
+    typedef typename Iterator< exposed_type >::Type   iterator_t;
+    typedef typename Position< exposed_type >::Type   position_t;
+    typedef typename Reference< exposed_type >::Type  reference_t;
+    typedef typename Size< exposed_type >::Type       size_t;
+    typedef typename Value< exposed_type >::Type      value_t;
 
     template< typename Class >
     static
     void
     expose( Class & _class ) {
-        const_container_exposer< exposed_t >::expose( _class );
+        const_container_exposer< exposed_type >::expose( _class );
         _class.def( "appendValue", _appendValue, "Append a value to this container." );
         _class.def( "resize", _resize, "Resize the container." );
     }
 
     static
     void
-    _appendValue( exposed_t & _self, reference_t x ) {
+    _appendValue( exposed_type & _self, reference_t x ) {
         return appendValue( _self, x );
     }
 
     static
     size_t
-    _resize( exposed_t & _self, size_t new_size ) {
+    _resize( exposed_type & _self, size_t new_size ) {
         return resize( _self, new_size );
     }
-
 };
 
 

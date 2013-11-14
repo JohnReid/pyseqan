@@ -9,6 +9,9 @@
 #define PYSEQAN_INFIX_JR_4JUN2013_
 
 #include <seqan/python/defs.h>
+#include <seqan/python/simple_type.h>
+#include <seqan/python/names.h>
+#include <seqan/python/container.h>
 
 
 
@@ -16,29 +19,6 @@
 
 namespace seqan {
 namespace python {
-
-
-/**
- * SeqAnise a boost::python::object that should be some sort of string.
- * That is leave it alone if it is already a SeqAn type (or some other random type).
- * If it is a python string then convert it to a SeqAn string over the given
- * alphabet.
- *
- * The motivation is that plenty of the methods in this package can handle
- * arguments of several types of SeqAn string but not python strings. We
- * use this function to check the arguments.
- */
-template< typename TString >
-py::object
-seqanise_string( py::object str ) {
-    if( PyString_Check( str.ptr() ) ) {
-        //std::cout << "Seqanising\n";
-        boost::shared_ptr< TString > seqanised( new TString( py::extract< TString >( str )() ) );
-        return py::object( seqanised );
-    } else {
-        return str; // do not modify
-    }
-}
 
 
 template< typename TString >
@@ -92,26 +72,25 @@ string_notequals( TString const & str, py::object obj ) {
 
 template< typename TString >
 struct infix_exposer
-: myrrh::python::expose_or_set_attribute< infix_exposer< TString > >
+: myrrh::python::ensure_exposer< infix_exposer< TString > >
 {
 
     typedef typename seqan::Infix< TString >::Type exposed_type;
     typedef typename Value< exposed_type >::Type value_type;
 
     void
-    expose( const char * name ) {
+    expose() {
         py::class_< exposed_type > _class(
-            name,
+            name< exposed_type >().c_str(),
             "Infix of string."
         );
         const_container_exposer< exposed_type >::expose( _class );
-        _class.def( "__str__", std_string_from_seqan< exposed_type >, "String representation." );
+        //_class.def( "__str__", std_string_from_seqan< exposed_type >, "String representation." );
         _class.def( "__getitem__", __getitem__< exposed_type >, "Get individual value or a slice. No support for irregular step sizes.", py::with_custodian_and_ward_postcall< 0, 1 >() );
         _class.def( "__eq__", string_equals< exposed_type > );
         _class.def( "__ne__", string_notequals< exposed_type > );
 
-        py::scope scope( _class );
-        simple_type_exposer< value_type >()( scope, "Value" );
+        simple_type_exposer< value_type >().ensure_exposed_and_add_as_attr( _class, "Value" );
     }
 };
 

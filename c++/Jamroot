@@ -68,7 +68,9 @@ cpp-pch pyseqan_pch
 python-extension _seqan
     : # sources
         src/module_pyseqan.cpp
-        src/python_seqan.cpp
+        src/expose_simple_types.cpp
+        src/expose_strings.cpp
+        src/expose_indexes.cpp
         $(PY_EXT_SOURCES)
         pyseqan_pch
     :
@@ -120,6 +122,8 @@ TEST_REQS =
 #
 unit-test test-small-index : src/test/small-index.cpp /site-config//rt : $(TEST_REQS) ;
 explicit test-small-index ;
+
+unit-test test-names : src/test/names.cpp /site-config//rt /site-config//python27 /site-config//z : $(TEST_REQS) ;
 
 obj sandbox-range : sandbox/myrrh_boost_range.cpp myrrh//myrrh ;
 explicit sandbox-range ;
