@@ -49,6 +49,8 @@ Strings are sequence containers.
     >>> seq = seqan.StringDNA('ACGTACGTACGT')
     >>> print seq[4:8]
     ACGT
+    >>> print seqan.StringDNA('AAGG').reversecomplement()
+    CCTT
 
 
 String sets
