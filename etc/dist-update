@@ -1,0 +1,64 @@
+#!/bin/bash -e
+
+
+#
+# Configuration
+#
+PYPI_NAME=pyseqan
+DIR=www/pyseqan
+HOST=zemlinsky
+UPLOAD_URL="http://pypi.python.org/pypi?%3Aaction=pkg_edit&name=$PYPI_NAME"
+CPLUSPLUSDIR=c++
+
+
+#
+# Check everything is checked in
+#
+if ! git st | grep "working directory clean"
+then
+  git st
+  echo "*************************************************************"
+  echo "You need to check in everything before updating distribution."
+  echo "*************************************************************"
+  exit -1
+fi
+
+
+
+#
+# Build C++ code to make sure API docs generate OK
+#
+(cd $CPLUSPLUSDIR; b2c -q -j8 release)
+
+
+#
+# Run tests
+#
+nosetests python/
+
+
+#
+# Update the documentation and upload to pypi and our web host
+#
+rm -rf docs/source/apidoc/
+pip install sphinx sphinx-pypi-upload cookbook
+sphinx-apidoc -H pybool -A "John Reid" -o docs/source/apidoc python/
+PYTHONPATH=python/ LD_LIBRARY_PATH=python/pybool/ python setup.py build_sphinx
+PYTHONPATH=python/ python setup.py upload_sphinx
+scp -r docs/build/html/* $HOST:$DIR/docs/build/html/
+
+
+#
+# Upload source build to pypi and our web host
+#
+python setup.py sdist upload --sign
+PACKAGE=$(ls -rt dist|tail -1) # get the latest package in dist/
+scp dist/$PACKAGE $HOST:$DIR/dist/
+
+
+#
+# Remind user
+#
+echo "**************************************************************************"
+echo "* Now is a good time to update the release number in the python package. *"
+echo "**************************************************************************"
