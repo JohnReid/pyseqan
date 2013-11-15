@@ -245,7 +245,8 @@ struct exposer< StringSet< TString, TSpec > >
             MYRRH_MAKE_STRING( "readFasta" << name< string_value_t >() ).c_str(),
             read_fasta< exposed_type >,
             ( py::arg( "fasta_filename" ), py::arg( "reverse" )=false ),
-            "Read a FASTA file into a seqan string set."
+            "Read a FASTA file into a seqan string set. Returns tuple "
+            "(num_bases, sequences, sequence_ids)."
         );
 
         py::class_<

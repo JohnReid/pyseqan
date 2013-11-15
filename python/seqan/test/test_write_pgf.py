@@ -2,19 +2,20 @@
 # Copyright John Reid 2013
 #
 
-"""
-Test writing a suffix tree as a PGF tree.
+"""Test writing a suffix tree as a PGF tree.
 
-We're looking for something like:
+We're looking for something like::
 
-    \tikz [font=\footnotesize,
-    grow=right, level 1/.style={sibling distance=6em},
-    level 2/.style={sibling distance=1em}, level distance=5cm]
+    \tikz [
+        font=\footnotesize,
+        grow=right, level 1/.style={sibling distance=6em},
+        level 2/.style={sibling distance=1em}, level distance=5cm
+    ]
     \node {Computational Complexity} % root
-    child { node {Computational Problems}
+    child { node {Computational Problems} }
     child { node {Problem Measures} }
     child { node {Problem Aspects} }
-    ... % as before
+
 """
 
 from seqan.test import fasta_file
@@ -25,6 +26,8 @@ from copy import copy
 
 
 def test_write_pgf():
+    """Test writing a PGF representing a suffix tree.
+    """
     _num_bases, sequences, _ids = seqan.readFastaDNA(fasta_file('dm01r.fasta'))
     #for s in sequences:
     #    s.remove('T')

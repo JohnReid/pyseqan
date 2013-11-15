@@ -2,9 +2,9 @@
 Sequence types
 ==============
 
-.. testsetup:: *
+..  testsetup:: *
 
-   import seqan
+    import seqan
 
 Simple types
 ------------
@@ -41,14 +41,14 @@ Strings
 
 Strings are sequence containers.
 
-.. doctest::
+..  doctest::
 
-   >>> seq = seqan.StringDNA5('ACGTNNNNACGT')
-   >>> print seq[4:8]
-   NNNN
-   >>> seq = seqan.StringDNA('ACGTACGTACGT')
-   >>> print seq[4:8]
-   ACGT
+    >>> seq = seqan.StringDNA5('ACGTNNNNACGT')
+    >>> print seq[4:8]
+    NNNN
+    >>> seq = seqan.StringDNA('ACGTACGTACGT')
+    >>> print seq[4:8]
+    ACGT
 
 
 String sets
@@ -56,15 +56,25 @@ String sets
 
 A StringSet is a container of strings.
 
-.. doctest::
+..  doctest::
 
-   >>> seqs = seqan.StringDNASet(('ACGT', 'AAAA', 'GGGG'))
-   >>> print type(seqs[0]).__name__
-   StringDNA
-   >>> print seqs[0]
-   ACGT
-   >>> print seqs[1]
-   AAAA
-   >>> print seqs[2]
-   GGGG
+    >>> seqs = seqan.StringDNASet(('ACGT', 'AAAA', 'GGGG'))
+    >>> print type(seqs[0]).__name__
+    StringDNA
+    >>> print seqs[0]
+    ACGT
+    >>> print seqs[1]
+    AAAA
+    >>> print seqs[2]
+    GGGG
+
+
+Input/output
+------------
+
+Sequences can be read into string sets from FASTA files::
+
+    >>> num_bases_read, seqs, seq_ids = seqan.readFastaDNA5('my-fasta-file.fa')
+    >>> print 'Read %d bases in %d sequences' % (num_bases_read, len(seqs))
+    Read 3412 bases in 10 sequences
 
