@@ -72,6 +72,17 @@ def test_string_infixes():
     assert 'ACGT' == str(s2[1:5])
 
 
+def test_string_reversecomplement():
+    logging.info(sys._getframe().f_code.co_name)
+    s1 = seqan.StringDNA5('AANNGG')
+    rc = s1.reversecomplement()
+    print rc
+    print str(rc)
+    assert seqan.StringDNA5('CCNNTT') == rc
+    del s1
+    assert seqan.StringDNA5('CCNNTT') == rc
+
+
 def test_string_infix_types_different():
     logging.info(sys._getframe().f_code.co_name)
     # check types are different

@@ -32,6 +32,36 @@ struct is_char_convertible< SimpleType< TValue, TSpec > > {
 };
 
 
+template< typename T >
+struct is_char_complementable {
+    typedef False Type;
+};
+
+
+template<>
+struct is_char_complementable< Dna > {
+    typedef True Type;
+};
+
+
+template<>
+struct is_char_complementable< Dna5 > {
+    typedef True Type;
+};
+
+
+template<>
+struct is_char_complementable< Rna > {
+    typedef True Type;
+};
+
+
+template<>
+struct is_char_complementable< Rna5 > {
+    typedef True Type;
+};
+
+
 } //namespace detail
 
 

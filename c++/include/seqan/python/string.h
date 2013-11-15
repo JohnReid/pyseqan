@@ -13,6 +13,7 @@
 #include <seqan/python/simple_type.h>
 #include <seqan/python/names.h>
 #include <seqan/python/segment.h>
+#include <seqan/python/modified.h>
 #include <seqan/sequence.h>
 #include <myrrh/python/boost_range.h>
 
@@ -28,46 +29,6 @@ struct _name< String< TValue, TSpec >, void >
 {
     std::string operator()() const {
         return MYRRH_MAKE_STRING( "String" << name< TValue >() );
-    }
-};
-
-
-/// Specialisation for seqan segment
-template< typename THost, typename TSpec >
-struct _name< Segment< THost, TSpec >, void >
-{
-    std::string operator()() const {
-        return MYRRH_MAKE_STRING( "" << name< THost >() << name< TSpec >() );
-    }
-};
-
-
-/// Specialisation for infix
-template<>
-struct _name< InfixSegment, void >
-{
-    std::string operator()() const {
-        return "Infix";
-    }
-};
-
-
-/// Specialisation for suffix
-template<>
-struct _name< SuffixSegment, void >
-{
-    std::string operator()() const {
-        return "Suffix";
-    }
-};
-
-
-/// Specialisation for postfix
-template<>
-struct _name< PrefixSegment, void >
-{
-    std::string operator()() const {
-        return "Prefix";
     }
 };
 
@@ -149,10 +110,11 @@ template< typename TValue, typename TSpec >
 struct exposer< String< TValue, TSpec > >
 : myrrh::python::ensure_exposer< exposer< String< TValue, TSpec > > >
 {
-
     typedef String< TValue, TSpec > exposed_type;
     typedef typename Position< exposed_type >::Type position_t;
     typedef typename Infix< exposed_type >::Type infix_t;
+    typedef typename detail::is_char_convertible< TValue >::Type is_value_char_convertible;
+    typedef typename detail::is_char_complementable< TValue >::Type is_char_complementable;
 
     static
     infix_t
@@ -164,26 +126,6 @@ struct exposer< String< TValue, TSpec > >
             throw std::invalid_argument( "End too large." );
         }
         return infix( _self, begin, end );
-    }
-
-    /** Expose string conversions if value is suitable. */
-    template< typename Class >
-    static
-    void
-    expose_string_conversions( Class & _class, seqan::False && ) {
-    }
-
-    /** Expose string conversions if value is suitable. */
-    template< typename Class >
-    static
-    void
-    expose_string_conversions( Class & _class, seqan::True && ) {
-        _class.def(
-            py::init< std::string const & >(
-                py::arg( "x" ),
-                "Construct a SeqAn string from the python string, x." ));
-        _class.def( "__str__", std_string_from_seqan< exposed_type >, "String representation." );
-        py::implicitly_convertible< std::string, exposed_type >();
     }
 
     static
@@ -198,20 +140,19 @@ struct exposer< String< TValue, TSpec > >
             name< exposed_type >().c_str(),
             "Wrapper for SeqAn C++ string."
         );
+        detail::expose_string_constructors< exposed_type >( _class, is_value_char_convertible() );
+        detail::expose_string_conversions< exposed_type >( _class, is_value_char_convertible() );
         container_exposer< exposed_type >::expose( _class );
         _class.def( "__getitem__", __getitem__< exposed_type >, "Get individual value or a slice. No support for irregular step sizes.", py::with_custodian_and_ward_postcall< 0, 1 >() );
         _class.def( "infix", _infix, "Infix of the string.", py::with_custodian_and_ward_postcall< 0, 1 >() );
-        _class.def( "__eq__", string_equals< exposed_type > );
-        _class.def( "__ne__", string_notequals< exposed_type > );
+        _class.def( "__eq__", detail::string_equals< exposed_type > );
+        _class.def( "__ne__", detail::string_notequals< exposed_type > );
 
-        expose_string_conversions( _class, typename detail::is_char_convertible< TValue >::Type() );
-
+        detail::expose_string_reverse_complement< exposed_type >( _class, is_char_complementable() );
         exposer< infix_t >().ensure_exposed_and_add_as_attr( _class, "Infix" );
         exposer< TValue >().ensure_exposed_and_add_as_attr( _class, "Value" );
     }
 };
-
-
 
 
 /**
