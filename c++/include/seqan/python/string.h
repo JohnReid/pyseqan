@@ -14,6 +14,7 @@
 #include <seqan/python/names.h>
 #include <seqan/python/segment.h>
 #include <seqan/sequence.h>
+#include <myrrh/python/boost_range.h>
 
 
 namespace seqan {
@@ -222,6 +223,21 @@ struct exposer< StringSet< TString, TSpec > >
     typedef StringSet< TString, TSpec > exposed_type;
     typedef typename Value< TString >::Type string_value_t;
 
+
+    static
+    boost::shared_ptr< exposed_type >
+    init_from_sequence( py::object pyseq ) {
+        boost::shared_ptr< exposed_type > result( new exposed_type );
+        BOOST_FOREACH(
+            TString const & x,
+            myrrh::python::make_boost_range< TString const >( pyseq )
+        ) {
+            appendValue( *result, x );
+        }
+        return result;
+    }
+
+
     static
     void
     expose() {
@@ -240,9 +256,9 @@ struct exposer< StringSet< TString, TSpec > >
             name< exposed_type >().c_str(),
             "Wrapper for SeqAn C++ string set."
         );
+        _class.def( "__init__", py::make_constructor( init_from_sequence ), "Construct a string set from a sequence of strings." );
         container_exposer< exposed_type >::expose( _class );
     }
-
 };
 
 

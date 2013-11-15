@@ -21,10 +21,10 @@ BOOST_AUTO_TEST_CASE( names ) {
     // test seqan simple types
     BOOST_CHECK( IsSimple< long >::Type::VALUE );
     BOOST_CHECK( IsSimple< Dna5 >::Type::VALUE );
-    BOOST_CHECK_EQUAL( "Dna" , name< Dna  >() );
-    BOOST_CHECK_EQUAL( "Dna5", name< Dna5 >() );
-    BOOST_CHECK_EQUAL( "Rna5", name< Rna5 >() );
-    BOOST_CHECK_EQUAL( "Rna" , name< Rna  >() );
+    BOOST_CHECK_EQUAL( "DNA" , name< Dna  >() );
+    BOOST_CHECK_EQUAL( "DNA5", name< Dna5 >() );
+    BOOST_CHECK_EQUAL( "RNA5", name< Rna5 >() );
+    BOOST_CHECK_EQUAL( "RNA" , name< Rna  >() );
 
     // test seqan pair
     BOOST_CHECK_EQUAL( "Pairint4int4", ( name< Pair< int, int > >() ) );

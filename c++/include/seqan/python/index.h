@@ -154,6 +154,16 @@ struct exposer< Index< TText, TSpec > > {
     }
 
 
+    /**
+     * A top down iterator for the index.
+     */
+    static
+    top_down_it
+    topdown( exposed_type & index ) {
+        return top_down_it( index );
+    }
+
+
     static
     void
     expose() {
@@ -171,6 +181,7 @@ struct exposer< Index< TText, TSpec > > {
             )[ py::with_custodian_and_ward< 1, 2 >() ]
         );
         _class.def( "visit", visit_tree, "Visit all the nodes in a tree. This can be useful to build the suffix tree ahead of doing any timings." );
+        _class.def( "topdown", topdown, "A top down iterator for the index." );
         _class.def( "__len__", __len__, "The length of the index." );
 
         iterator_exposer< top_down_it >().ensure_exposed_and_add_as_attr( _class, "TopDownIterator" );

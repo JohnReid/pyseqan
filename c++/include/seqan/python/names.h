@@ -43,31 +43,31 @@ struct _simple_type_name  {
 /// Specialisation of meta-function to produce correct name for a simple type spec.
 template<>
 struct _simple_type_name< Dna_ > {
-    static constexpr const char * result = "Dna";
+    static constexpr const char * result = "DNA";
 };
 
 /// Specialisation of meta-function to produce correct name for a simple type spec.
 template<>
 struct _simple_type_name< Dna5_ > {
-    static constexpr const char * result = "Dna5";
+    static constexpr const char * result = "DNA5";
 };
 
 /// Specialisation of meta-function to produce correct name for a simple type spec.
 template<>
 struct _simple_type_name< Rna_ > {
-    static constexpr const char * result = "Rna";
+    static constexpr const char * result = "RNA";
 };
 
 /// Specialisation of meta-function to produce correct name for a simple type spec.
 template<>
 struct _simple_type_name< Rna5_ > {
-    static constexpr const char * result = "Rna5";
+    static constexpr const char * result = "RNA5";
 };
 
 /// Specialisation of meta-function to produce correct name for a simple type spec.
 template<>
 struct _simple_type_name< Iupac_ > {
-    static constexpr const char * result = "Iupac";
+    static constexpr const char * result = "IUPAC";
 };
 
 /// Specialisation of meta-function to produce correct name for a simple type spec.
