@@ -1,11 +1,9 @@
 The pyseqan python package
 ==========================
 
-pyseqan is a python interface to the SeqAn__ C++
+pyseqan is a python interface to the [SeqAn](http://www.seqan.de/) C++
 sequence analysis library. pyseqan exposes functionality such as enhanced
 suffix arrays via an easy-to-use python interface.
-
-.. _SeqAn: http://www.seqan.de/
 
 
 Efficiency
@@ -28,5 +26,4 @@ pyseqan currently exposes:
 
 There is much more functionality available through the SeqAn C++ API. pyseqan
 is extensible and will add this functionality as needed. Please make requests
-for additions on the `Github issues page
-<https://github.com/JohnReid/pyseqan/issues>`_.
+for additions on the [Github issues page](https://github.com/JohnReid/pyseqan/issues).
