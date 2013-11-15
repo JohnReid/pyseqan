@@ -16,7 +16,7 @@ set easily.
     >>> seqs = seqan.StringDNASet(('ACGT', 'AAAA', 'GGGG', 'AC'))
     >>> index = seqan.IndexStringDNASetESA(seqs)
 
-Once we have the index we can find strings in it using a top down iterator.
+Once we have the index we can find strings in the string set using a top down iterator.
 
 ..  doctest::
 
