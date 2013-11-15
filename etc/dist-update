@@ -14,14 +14,14 @@ CPLUSPLUSDIR=c++
 #
 # Check everything is checked in
 #
-#if ! git st | grep "working directory clean"
-#then
-  #git st
-  #echo "*************************************************************"
-  #echo "You need to check in everything before updating distribution."
-  #echo "*************************************************************"
-  #exit -1
-#fi
+if ! git st | grep "working directory clean"
+then
+  git st
+  echo "*************************************************************"
+  echo "You need to check in everything before updating distribution."
+  echo "*************************************************************"
+  exit -1
+fi
 
 
 
@@ -40,7 +40,7 @@ CPLUSPLUSDIR=c++
 #
 # Run tests
 #
-#nosetests python/
+nosetests python/
 
 
 #
@@ -57,7 +57,7 @@ scp -r docs/build/html/* $HOST:$DIR/docs/build/html/
 # Upload source build to pypi and our web host
 #
 python setup.py sdist upload --sign
-PACKAGE=$(ls -rt dist|tail -1) # get the latest package in dist/
+PACKAGE=$(ls -rt dist|grep -v asc|tail -1) # get the latest package in dist/
 scp dist/$PACKAGE $HOST:$DIR/dist/
 
 
