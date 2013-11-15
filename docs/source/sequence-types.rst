@@ -6,7 +6,7 @@ Sequence types
 
    import seqan
 
-Simple Types
+Simple types
 ------------
 
 SeqAn simple types represent alphabets for DNA, RNA and amino acids.

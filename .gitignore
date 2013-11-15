@@ -1,1 +1,4 @@
 install-test-env
+virtualenv
+dist
+suffix-tree.tex

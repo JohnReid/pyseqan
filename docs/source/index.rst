@@ -14,6 +14,7 @@ Contents
 
    sequence-types
    indexes
+   apidoc/modules
 
 
 

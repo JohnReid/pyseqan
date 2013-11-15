@@ -12,9 +12,9 @@ import seqan
 from copy import copy
 
 def test_property_map():
-    _num_bases, sequences, _ids = seqan.readFastaDna5(fasta_file('dm01r.fasta'))
+    _num_bases, sequences, _ids = seqan.readFastaDNA5(fasta_file('dm01r.fasta'))
     logging.info('Building index')
-    index = seqan.IndexStringDna5SetESA(sequences)
+    index = seqan.IndexStringDNA5SetESA(sequences)
     logging.info('Creating property map of length %d', len(index))
     property_map = [None] * (2 * len(index))
 

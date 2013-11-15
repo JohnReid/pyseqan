@@ -57,17 +57,17 @@ def check_comparisons_both_ways(str_type_1, str_type_2):
 def test_string_comparison():
     logging.info(sys._getframe().f_code.co_name)
     for str_type_1, str_type_2 in \
-        combinations((str, seqan.StringDna, infix_maker(seqan.StringDna)), 2):
+        combinations((str, seqan.StringDNA, infix_maker(seqan.StringDNA)), 2):
         check_comparisons_both_ways(str_type_1, str_type_2)
     for str_type_1, str_type_2 in \
-        combinations((str, seqan.StringDna5, infix_maker(seqan.StringDna5)), 2):
+        combinations((str, seqan.StringDNA5, infix_maker(seqan.StringDNA5)), 2):
         check_comparisons_both_ways(str_type_1, str_type_2)
 
 
 def test_string_infixes():
     logging.info(sys._getframe().f_code.co_name)
-    s1 = seqan.StringDna('ACGTACGTACGT')
-    s2 = seqan.StringDna('TACGTACGTACG')
+    s1 = seqan.StringDNA('ACGTACGTACGT')
+    s2 = seqan.StringDNA('TACGTACGTACG')
     assert 'ACGT' == s1[0:4]
     assert 'ACGT' == str(s2[1:5])
 
@@ -75,27 +75,27 @@ def test_string_infixes():
 def test_string_infix_types_different():
     logging.info(sys._getframe().f_code.co_name)
     # check types are different
-    assert seqan.StringDna.Infix != seqan.StringDna5.Infix
+    assert seqan.StringDNA.Infix != seqan.StringDNA5.Infix
 
     # check string representations different - they actually have same name
-#     assert str(seqan.StringDna.Infix) != str(seqan.StringDna5.Infix), \
-#         '%s == %s' % (seqan.StringDna.Infix, seqan.StringDna5.Infix)
+#     assert str(seqan.StringDNA.Infix) != str(seqan.StringDNA5.Infix), \
+#         '%s == %s' % (seqan.StringDNA.Infix, seqan.StringDNA5.Infix)
 
 
 
 def test_strings():
     logging.info(sys._getframe().f_code.co_name)
-    _num_bases, sequences, ids = seqan.readFastaDna5(fasta_file('dm01r.fasta'))
+    _num_bases, sequences, ids = seqan.readFastaDNA5(fasta_file('dm01r.fasta'))
 
-    logging.info('Size of Dna5 alphabet %d', seqan.Dna5.valueSize )
-    logging.info('Size of Dna alphabet %d', seqan.Dna.valueSize )
+    logging.info('Size of DNA5 alphabet %d', seqan.DNA5.valueSize )
+    logging.info('Size of DNA alphabet %d', seqan.DNA.valueSize )
     logging.info('Length of sequence %s %d', ids[3], len(sequences[3]))
     logging.info('Tenth base of sequence %s %s', ids[2], sequences[2].value(9))
     logging.info('Infix of sequence %s %s', ids[2], sequences[2].infix(9, 14))
 
 
-    _s5 = seqan.StringDna5('ACGTACGTACGTACGT')
-    s4 = seqan.StringDna('ACGTACGTACGTACGT')
+    _s5 = seqan.StringDNA5('ACGTACGTACGTACGT')
+    s4 = seqan.StringDNA('ACGTACGTACGTACGT')
     s = s4
     infix = s.infix(3, 9)
     slice_ = s[3:9]
@@ -122,7 +122,7 @@ def test_strings():
     assert i == len(s) - 1
 
 
-    s5 = seqan.StringDna5('NACGTNNACGTNACGTNACGT')
+    s5 = seqan.StringDNA5('NACGTNNACGTNACGTNACGT')
     print s5[0] == 'N'
     assert s5[0] == 'N'
     print s5[0] != 'G'
@@ -143,8 +143,8 @@ def test_strings():
 
 def test_string_set_iteration():
     logging.info(sys._getframe().f_code.co_name)
-    stringset = seqan.StringDna5Set()
-    stringset.appendValue(seqan.StringDna5('ACGTACGTACGTNNN'))
+    stringset = seqan.StringDNA5Set()
+    stringset.appendValue(seqan.StringDNA5('ACGTACGTACGTNNN'))
     i = iter(stringset)
     try:
         while True:
@@ -156,8 +156,8 @@ def test_string_set_iteration():
 
 def test_string_set_append():
     logging.info(sys._getframe().f_code.co_name)
-    stringset = seqan.StringDna5Set()
-    stringset.appendValue(seqan.StringDna5('ACGTACGTACGTNNN'))
+    stringset = seqan.StringDNA5Set()
+    stringset.appendValue(seqan.StringDNA5('ACGTACGTACGTNNN'))
 
 if '__main__' == __name__:
-    assert str('A') == seqan.StringDna('A')
+    assert str('A') == seqan.StringDNA('A')

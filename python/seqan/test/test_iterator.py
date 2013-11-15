@@ -14,11 +14,11 @@ from copy import copy
 
 
 def _make_test_index():
-    strings = seqan.StringDna5Set()
-    strings.appendValue(seqan.StringDna5('ACG'))
-    strings.appendValue(seqan.StringDna5('AA'))
-    strings.appendValue(seqan.StringDna5('NN'))
-    return seqan.IndexStringDna5SetESA(strings)
+    strings = seqan.StringDNA5Set()
+    strings.appendValue(seqan.StringDNA5('ACG'))
+    strings.appendValue(seqan.StringDNA5('AA'))
+    strings.appendValue(seqan.StringDNA5('NN'))
+    return seqan.IndexStringDNA5SetESA(strings)
 
 
 def test_representative_equality():
@@ -42,26 +42,26 @@ def test_go_down_str():
     logging.info(sys._getframe().f_code.co_name)
     index = _make_test_index()
     i = index.TopDownIterator(index)
-    assert copy(i).goDownStr(seqan.StringDna5('C'))
+    assert copy(i).goDownStr(seqan.StringDNA5('C'))
     assert copy(i).goDownStr('C')
-    assert not copy(i).goDownStr(seqan.StringDna5('T'))
+    assert not copy(i).goDownStr(seqan.StringDNA5('T'))
     assert not copy(i).goDownStr('T')
-    assert not copy(i).goDownStr(seqan.StringDna5('ACGT'))
+    assert not copy(i).goDownStr(seqan.StringDNA5('ACGT'))
     assert copy(i).goDownStr('AC')
-    assert copy(i).goDownStr(seqan.StringDna5('AC'))
-    assert copy(i).goDownStr(seqan.StringDna5('ACG'))
+    assert copy(i).goDownStr(seqan.StringDNA5('AC'))
+    assert copy(i).goDownStr(seqan.StringDNA5('ACG'))
     assert copy(i).goDownStr('AA')
     assert copy(i).goDownStr('A')
     assert copy(i).goDownStr('NN')
     assert copy(i).goDownStr('N')
-    check_go_down_str(copy(i), seqan.StringDna5('ACG'), 'ACG')
-    check_go_down_str(copy(i), seqan.StringDna5('AC' ), 'ACG')
+    check_go_down_str(copy(i), seqan.StringDNA5('ACG'), 'ACG')
+    check_go_down_str(copy(i), seqan.StringDNA5('AC' ), 'ACG')
 
 
 def _build_index():
-    _num_bases, sequences, _ids = seqan.readFastaDna5(fasta_file('dm01r.fasta'))
+    _num_bases, sequences, _ids = seqan.readFastaDNA5(fasta_file('dm01r.fasta'))
     logging.info('Building index')
-    return seqan.IndexStringDna5SetESA(sequences)
+    return seqan.IndexStringDNA5SetESA(sequences)
 
 
 def test_iterator():

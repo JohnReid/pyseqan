@@ -25,10 +25,10 @@ from copy import copy
 
 
 def test_write_pgf():
-    _num_bases, sequences, _ids = seqan.readFastaDna(fasta_file('dm01r.fasta'))
+    _num_bases, sequences, _ids = seqan.readFastaDNA(fasta_file('dm01r.fasta'))
     #for s in sequences:
     #    s.remove('T')
-    index = seqan.IndexStringDnaSetESA(sequences)
+    index = seqan.IndexStringDNASetESA(sequences)
     suffix = 'GCCGAA'
 
     def descend(i):
