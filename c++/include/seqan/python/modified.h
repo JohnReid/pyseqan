@@ -90,6 +90,7 @@ struct exposer< ModifiedString< THost, TSpec > >
         const_container_exposer< exposed_type >::expose( _class );
         detail::expose_string_conversions< exposed_type >( _class, is_value_char_convertible() );
         exposer< infix_t >().ensure_exposed_and_add_as_attr( _class, "Infix" );
+        exposer< value_type >().ensure_exposed_and_add_as_attr( _class, "Value" );
     }
 };
 

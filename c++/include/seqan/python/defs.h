@@ -40,7 +40,7 @@ set_index_error() {
 
 
 /** Expose a seqan type. */
-template< typename Exposed >
+template< typename Exposed, typename Enable=void >
 struct exposer {
     static
     void
@@ -49,6 +49,22 @@ struct exposer {
             MYRRH_MAKE_STRING(
                 "exposer<> is not specialized for "
                 << typeid( Exposed ).name() ) );
+    }
+};
+
+
+// Don't need to expose arithmetic types
+template< typename Exposed >
+struct exposer<
+    Exposed,
+    typename boost::enable_if<
+        typename boost::is_arithmetic< Exposed >::type
+    >::type
+> {
+    template< typename Class >
+    const boost::python::converter::registration *
+    ensure_exposed_and_add_as_attr( Class &, const char * ) {
+        return 0;
     }
 };
 

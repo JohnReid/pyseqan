@@ -13,6 +13,7 @@
 #include <seqan/python/string.h>
 #include <seqan/python/segment.h>
 #include <seqan/index.h>
+#include <seqan/index/index_sa_stree.h>
 
 
 
@@ -22,12 +23,42 @@ namespace python {
 namespace detail {
 
 
-/// Specialisation for vertex
+/// Specialisation for ESA vertex
 template< typename T >
 struct _name< VertexEsa< T > >
 {
     std::string operator()() const {
-        return MYRRH_MAKE_STRING( "VertexEsa" );
+        return "VertexESA";
+    }
+};
+
+
+/// Specialisation for SA vertex
+template< typename TSize, typename TAlphabet >
+struct _name< VertexSA< TSize, TAlphabet > >
+{
+    std::string operator()() const {
+        return "VertexSA";
+    }
+};
+
+
+/// Specialisation for WOTD vertex
+template< typename T >
+struct _name< VertexWotdModified_< T > >
+{
+    std::string operator()() const {
+        return "VertexWOTD";
+    }
+};
+
+
+/// Specialisation for WOTD vertex
+template< typename TValue, typename T >
+struct _name< VertexFmi< TValue, T > >
+{
+    std::string operator()() const {
+        return MYRRH_MAKE_STRING( "VertexFM" << name< TValue >() );
     }
 };
 
@@ -52,6 +83,26 @@ struct _name< IndexEsa<> >
 };
 
 
+/// Specialisation for SA
+template<>
+struct _name< IndexSa<> >
+{
+    std::string operator()() const {
+        return "SA";
+    }
+};
+
+
+/// Specialisation for FM index
+template<>
+struct _name< FMIndex<> >
+{
+    std::string operator()() const {
+        return "FM";
+    }
+};
+
+
 /// Specialisation for Wotd
 template<>
 struct _name< IndexWotd<> >
@@ -62,14 +113,50 @@ struct _name< IndexWotd<> >
 };
 
 
-} //namespace detail
+template< typename T >
+struct
+is_vertex {
+    typedef False Type;
+};
 
 
 template< typename TSize >
-struct exposer< VertexEsa< TSize > >
-: myrrh::python::ensure_exposer< exposer< VertexEsa< TSize > > >
+struct
+is_vertex< VertexEsa< TSize > > {
+    typedef True Type;
+};
+
+
+template< typename TSize, typename TAlphabet >
+struct
+is_vertex< VertexSA< TSize, TAlphabet > > {
+    typedef True Type;
+};
+
+
+template< typename T >
+struct
+is_vertex< VertexWotdModified_< T > > {
+    typedef True Type;
+};
+
+
+template< typename TValue, typename T >
+struct
+is_vertex< VertexFmi< TValue, T > > {
+    typedef True Type;
+};
+
+
+} //namespace detail
+
+
+template< typename Exposed >
+struct exposer< Exposed, SEQAN_FUNC_ENABLE_IF( detail::is_vertex< Exposed >, void ) >
+: myrrh::python::ensure_exposer< exposer< Exposed > >
 {
-    typedef VertexEsa< TSize >              exposed_type;
+    typedef Exposed                               exposed_type;
+    typedef typename Size< exposed_type >::Type   size_type;
 
 
     static
@@ -80,7 +167,7 @@ struct exposer< VertexEsa< TSize > >
 
 
     static
-    TSize
+    size_type
     id( exposed_type const & v ) {
         return _getId( v );
     }
@@ -111,6 +198,7 @@ struct exposer< Index< TText, TSpec > > {
     typedef typename Value< string_t >::Type                    alphabet_t;
     typedef typename VertexDescriptor< exposed_type >::Type     vertex_t;
     typedef typename Fibre< exposed_type, EsaSA >::Type         sa_fibre_t;
+    typedef typename Fibre< exposed_type, EsaText >::Type       text_fibre_t;
     typedef typename Infix< sa_fibre_t const >::Type            sa_infix_t;
     typedef typename Value< sa_infix_t >::Type                  sa_value_t;
     typedef typename Iterator< exposed_type, TopDown<> >::Type  top_down_it;
@@ -155,6 +243,16 @@ struct exposer< Index< TText, TSpec > > {
 
 
     /**
+     * The text of the index.
+     */
+    static
+    text_fibre_t const &
+    text( exposed_type & index ) {
+        return indexText( index );
+    }
+
+
+    /**
      * A top down iterator for the index.
      */
     static
@@ -163,11 +261,34 @@ struct exposer< Index< TText, TSpec > > {
         return top_down_it( index );
     }
 
+    /**
+     * Save the index.
+     */
+    static
+    void
+    save( exposed_type & index, const char * filename ) {
+        if( ! seqan::save( index, filename ) ) {
+            throw std::logic_error( MYRRH_MAKE_STRING( "Could not save index to: " << filename ) );
+        }
+    }
+
+    /**
+     * Load the index from the filename.
+     */
+    static
+    boost::shared_ptr< exposed_type >
+    load( const char * filename ) {
+        boost::shared_ptr< exposed_type > result( new exposed_type );
+        if( ! seqan::open( *result, filename ) ) {
+            throw std::logic_error( MYRRH_MAKE_STRING( "Could not load index from: " << filename ) );
+        }
+        return result;
+    }
+
 
     static
     void
     expose() {
-
         py::class_<
             exposed_type,
             boost::shared_ptr< exposed_type >,
@@ -181,8 +302,12 @@ struct exposer< Index< TText, TSpec > > {
             )[ py::with_custodian_and_ward< 1, 2 >() ]
         );
         _class.def( "visit", visit_tree, "Visit all the nodes in a tree. This can be useful to build the suffix tree ahead of doing any timings." );
+        _class.def( "save", save, "Save the index." );
+        _class.def( "load", load, "Load the index." );
+        _class.staticmethod( "load" );
         _class.def( "topdown", topdown, "A top down iterator for the index." );
         _class.def( "__len__", __len__, "The length of the index." );
+        _class.add_property( "text", py::make_function( text, py::return_internal_reference<>() ), "The text of the index." );
 
         iterator_exposer< top_down_it >().ensure_exposed_and_add_as_attr( _class, "TopDownIterator" );
         exposer< sa_infix_t >().ensure_exposed_and_add_as_attr( _class, "Infix" );

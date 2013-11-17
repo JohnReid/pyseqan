@@ -52,7 +52,20 @@ struct _name< ParentLinks< TSpec > >
 };
 
 
+template< typename TIndex >
+struct is_esa {
+    typedef False Type;
+};
+
+
+template< typename TText >
+struct is_esa< Index< TText, IndexEsa<> > > {
+    typedef True Type;
+};
+
+
 } //namespace detail
+
 
 /**
  * SeqAn-ise a boost::python::object that should be some sort of string.
@@ -98,17 +111,20 @@ struct iterator_exposer
     typedef typename Fibre< container_t, EsaSA >::Type       sa_fibre_t;
     typedef typename Infix< sa_fibre_t const >::Type         sa_infix_t;
 
+
     static
     size_t
     rep_length( exposed_type it ) {
         return repLength( it );
     }
 
+
     static
     infix_t
     get_representative( exposed_type it ) {
         return representative( it );
     }
+
 
     static
     size_t
@@ -223,6 +239,20 @@ struct iterator_exposer
         return isRoot( it );
     }
 
+    template< typename Class >
+    static
+    void
+    expose_esa_methods( Class & _class, False && ) {
+    }
+
+    template< typename Class >
+    static
+    void
+    expose_esa_methods( Class & _class, True && ) {
+        _class.add_property( "parentEdgeLabel", parent_edge_label, "The label of the edge from the parent node to this node." );
+        _class.def( "goDownStr", go_down_str, "Iterates down the iterator following the string." );
+    }
+
     static
     void
     expose() {
@@ -245,10 +275,10 @@ struct iterator_exposer
                 ),
                 "Construct an iterator to the given vertex in the index."
             )[ py::with_custodian_and_ward< 1, 2 >() ] );
+        expose_esa_methods( _class, typename detail::is_esa< container_t >::Type() );
         _class.add_property( "repLength", rep_length, "The length of the representative substring of this iterator." );
         _class.add_property( "representative", get_representative, "A representative substring of this iterator." );
         _class.add_property( "parentEdgeLength", parent_edge_length, "The length of the label of the edge from the parent node to this node." );
-        _class.add_property( "parentEdgeLabel", parent_edge_label, "The label of the edge from the parent node to this node." );
         _class.add_property( "countOccurrences", count_occurrences, "Number of occurrences of the prefix this iterator represents." );
         _class.add_property( "occurrences", get_occurrences, "All occurrences of the representative substring or a q-gram in the index text." );
         _class.add_property( "countChildren", count_children, "The number of children of this node." );
@@ -256,7 +286,6 @@ struct iterator_exposer
         _class.add_property( "isRoot", is_root, "Does the iterator point at the root of the index?" );
         _class.def( "goDown", go_down, "Iterates down one edge or a path in a tree." );
         _class.def( "goDownChar", go_down_char, "Iterates down one edge or a path in a tree which starts with given character." );
-        _class.def( "goDownStr", go_down_str, "Iterates down the iterator following the string." );
         _class.def( "goRight", go_right, "Iterates to the next sibling in a tree." );
         _class.def( "__copy__", __copy__, "Returns a copy of this iterator." );
 

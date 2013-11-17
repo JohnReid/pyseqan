@@ -15,6 +15,10 @@ void
 expose_indexes() {
 	using namespace seqan;
     using namespace seqan::python;
+    //exposer< Index< StringSet< String< char > > > >::expose(); // doesn't compile - TODO: fix
     exposer< Index< StringSet< String< Dna  > > > >::expose();
     exposer< Index< StringSet< String< Dna5 > > > >::expose();
+    //exposer< Index< StringSet< String< Dna5 > >, IndexSa<> > >::expose(); // doesn't compile _getId() problem on vertices
+    exposer< Index< StringSet< String< Dna5 > >, IndexWotd<> > >::expose();
+    //exposer< Index< StringSet< String< Dna5 > >, FMIndex<> > >::expose(); // doesn't compile _getId() problem on vertices
 }

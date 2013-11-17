@@ -66,7 +66,7 @@ struct is_char_complementable< Rna5 > {
 
 
 /**
- * Simple type exposer.
+ * Mutable pair exposer.
  */
 template< typename T1, typename T2, typename TSpec >
 struct exposer< Pair< T1, T2, TSpec > >
@@ -92,6 +92,39 @@ struct exposer< Pair< T1, T2, TSpec > >
         _class.def( "__str__", __str__, "A string representation." );
         _class.def_readwrite( "i1", &exposed_type::i1 );
         _class.def_readwrite( "i2", &exposed_type::i2 );
+    }
+
+
+};
+
+
+/**
+ * Const pair exposer.
+ */
+template< typename T1, typename T2, typename TSpec >
+struct exposer< const Pair< T1, T2, TSpec > >
+: myrrh::python::ensure_exposer< exposer< Pair< T1, T2, TSpec > > >
+{
+    typedef const Pair< T1, T2, TSpec > exposed_type;
+
+
+    static
+    std::string
+    __str__( exposed_type const & x ) {
+        return MYRRH_MAKE_STRING( "Pair<" << x.i1 << "," << x.i2 << ">" );
+    }
+
+    static
+    void
+    expose() {
+        py::class_< exposed_type > _class(
+            name< exposed_type >().c_str(),
+            "Wrapper for SeqAn Pair."
+        );
+
+        _class.def( "__str__", __str__, "A string representation." );
+        _class.def_readonly( "i1", &exposed_type::i1 );
+        _class.def_readonly( "i2", &exposed_type::i2 );
     }
 
 

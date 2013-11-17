@@ -81,6 +81,7 @@ def test_iterator():
     i.goDownChar('C')
     assert 'ACTC' == i.representative
     logging.info(i.representative)
+    assert i.parentEdgeLabel == 'ACTC'[-i.parentEdgeLength:]
 
     # check memory handling
     r = i.representative
