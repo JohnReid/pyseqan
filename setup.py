@@ -81,7 +81,7 @@ def main():
     # C++ extension
     #
     seqanext = Extension(
-        'seqan._seqan',
+        'seqan._release_build._seqan',
         [
             'c++/src/expose_indexes.cpp',
             'c++/src/expose_simple_types.cpp',
@@ -90,7 +90,7 @@ def main():
         ],
         include_dirs         = INCLUDE_DIRS,
         library_dirs         = LIBRARY_DIRS,
-        libraries            = LIBRARIES,
+        libraries            = LIBRARIES + ['rt'],
         define_macros        = list(EXTRA_DEFINES.items()),
         extra_compile_args   = [
             '-std=c++0x',
@@ -131,7 +131,7 @@ def main():
         packages             = find_packages(where='python'),
         package_dir          = { '' : 'python' },
         #py_modules           = ['pybool.examples.tutorial']
-        package_data         = { 'pyseqan': ['README', 'LICENSE', 'VERSION'] },
+        package_data         = { 'seqan': ['README', 'LICENSE', 'VERSION'] },
         install_requires     = [
                                 'cookbook',
                                ],
