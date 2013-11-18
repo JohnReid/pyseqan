@@ -1,0 +1,13 @@
+#
+# Exclude all the stuff that is only included as it is under source control
+#
+exclude run-dir/*
+
+include configure.py
+include aksetup_helper.py
+include README.md
+include LICENSE.md
+include python/seqan/VERSION
+include python/seqan/README
+
+recursive-include c++ *.h *.hpp *.cpp *.c wisdom
