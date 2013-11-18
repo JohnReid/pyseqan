@@ -1,7 +1,7 @@
 #!/bin/bash -ex
 
 ENV=install-test-env
-[ ! -d $ENV ]
+#[ ! -d $ENV ]
 virtualenv $ENV
 . $ENV/bin/activate
 
@@ -16,9 +16,9 @@ python -c "import $PACKAGE"
 $UNINSTALL
 
 # Install from PyPI
-pip install $PYPI
-python -c "import $PACKAGE"
-$UNINSTALL
+#pip install $PYPI
+#python -c "import $PACKAGE"
+#$UNINSTALL
 
 # Install local version
 python setup.py install

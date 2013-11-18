@@ -9,12 +9,13 @@
 Contents
 --------
 
-.. toctree::
-   :maxdepth: 2
+..  toctree::
+    :maxdepth: 2
 
-   sequence-types
-   indexes
-   apidoc/modules
+    install
+    sequence-types
+    indexes
+    apidoc/modules
 
 
 
