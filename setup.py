@@ -23,7 +23,7 @@ def read(*fnames):
 
 def get_config_schema():
     from aksetup_helper import ConfigSchema, BoostLibraries, \
-            StringListOption, make_boost_base_options
+            Option, StringListOption, make_boost_base_options
     import sys
 
     if 'darwin' in sys.platform:
@@ -38,7 +38,7 @@ def get_config_schema():
     return ConfigSchema(
         make_boost_base_options() + [
             BoostLibraries("python"),
-
+            Option("SEQAN_DIR"),
             StringListOption("CXXFLAGS", ["-Wno-sign-compare"],
                 help="Any extra C++ compiler options to include"),
             StringListOption("LDFLAGS", [],
@@ -50,16 +50,26 @@ def get_config_schema():
 
 
 def main():
-    from aksetup_helper import hack_distutils, get_config, setup, NumpyExtension
-    from setuptools import find_packages
+    from aksetup_helper import hack_distutils, get_config, setup
+    from setuptools import find_packages, Extension
 
     hack_distutils()
     conf = get_config(get_config_schema())
 
-    INCLUDE_DIRS = ['C++/myrrh'] + conf['BOOST_INC_DIR']
+    INCLUDE_DIRS = [
+        'c++', 
+        os.path.join('c++', 'include'),
+        os.path.join('c++', 'boost-indexing-suite'),
+        os.path.join('c++', 'myrrh'),
+    ] + conf['BOOST_INC_DIR'] + [os.path.join(conf['SEQAN_DIR'], 'include')]
     LIBRARY_DIRS = conf['BOOST_LIB_DIR']
     LIBRARIES = conf['BOOST_PYTHON_LIBNAME']
-    EXTRA_DEFINES = { }
+    EXTRA_DEFINES = { 
+        "SEQAN_ENABLE_TESTING"  : "0",
+        "SEQAN_ENABLE_DEBUG"    : "0",
+        "BOOST_DISABLE_ASSERTS" : "0",
+        "MYRRH_DISABLE_ASSERTS" : "0",
+    }
 
     try:
         from distutils.command.build_py import build_py_2to3 as build_py
@@ -70,7 +80,7 @@ def main():
     #
     # C++ extension
     #
-    seqanext = NumpyExtension(
+    seqanext = Extension(
         'seqan._seqan',
         [
             'c++/src/expose_indexes.cpp',
@@ -82,7 +92,10 @@ def main():
         library_dirs         = LIBRARY_DIRS,
         libraries            = LIBRARIES,
         define_macros        = list(EXTRA_DEFINES.items()),
-        extra_compile_args   = conf['CXXFLAGS'],
+        extra_compile_args   = [
+            '-std=c++0x',
+            '-Wno-deprecated-declarations',
+        ] + conf['CXXFLAGS'],
         extra_link_args      = conf['LDFLAGS'],
     )
 
