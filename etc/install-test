@@ -16,9 +16,9 @@ python -c "import $PACKAGE"
 $UNINSTALL
 
 # Install from PyPI
-#pip install $PYPI
-#python -c "import $PACKAGE"
-#$UNINSTALL
+pip install $PYPI
+python -c "import $PACKAGE"
+$UNINSTALL
 
 # Install local version
 python setup.py install
