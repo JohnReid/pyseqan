@@ -6,7 +6,7 @@
 Test building an index.
 """
 
-import seqan, sys, logging
+import seqan, sys, logging, tempfile, os
 from seqan.test import fasta_file, show_shallow_tree
 
 
@@ -47,8 +47,10 @@ def test_save_load_index():
     for IndexDNA5 in IndexesDNA5:
         _num_bases, sequences, _ids = seqan.readFastaDNA5(fasta_file('dm01r.fasta'))
         index = IndexDNA5(sequences)
-        index.save('index.saved')
-        index2 = IndexDNA5.load('index.saved')
+        tmpdir = tempfile.mkdtemp(suffix='test-index-save')
+        filename = os.path.join(tmpdir, 'index.saved')
+        index.save(filename)
+        index2 = IndexDNA5.load(filename)
         i = index2.topdown()
         i.goDownChar('A')
         text = index2.text

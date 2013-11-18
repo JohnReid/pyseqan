@@ -27,3 +27,11 @@ def version_string():
     return '%s %s' % (__release__, __git_id__)
 
 
+def property_map_for(index, dtype=None):
+    """Create a sparse matrix suitable for use as a property map for the index.
+    The data type will be an unsigned int unless specified."""
+    from scipy.sparse import dok_matrix
+    from scipy import uint32
+    if dtype is None:
+        dtype = uint32
+    return dok_matrix((2 * len(index), 4), dtype=dtype)

@@ -15,7 +15,7 @@ def assert_eq(x1, x2):
 
 def assert_ne(x1, x2):
     assert x1 != x2, '(%s) %s == %s (%s)' % (type(x1).__name__, x1, x2, type(x2).__name__)
-    
+
 
 def check_n(x):
     logging.info('%s %s', x, type(x))
@@ -24,6 +24,7 @@ def check_n(x):
     assert_eq(x, DNA5('N'))
     assert_ne(x, DNA5('G'))
     assert_ne(x, DNA('G'))
+    assert_ne(x, DNA(2))
 
 
 def check_g(x):
@@ -32,6 +33,8 @@ def check_g(x):
     assert_eq(x, 'G')
     assert_ne(x, DNA5('N'))
     assert_eq(x, DNA5('G'))
+    assert_ne(x, DNA5(4))
+    assert_eq(x, DNA5(2))
 
 
 def test_n():
