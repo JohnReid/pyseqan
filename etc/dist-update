@@ -40,7 +40,7 @@ fi
 #
 # Run tests
 #
-nosetests python/
+#nosetests python/
 
 
 #
