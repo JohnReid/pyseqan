@@ -16,4 +16,4 @@ def test_small_index():
     index = seqan.IndexStringDNASetESA(string_set)
     i = index.TopDownIterator(index)
     1/0  # The following core dumps due to seqan bug (http://trac.seqan.de/ticket/1122)
-    i.goDownStr(seqan.StringDNA('A'))
+    i.goDown(seqan.StringDNA('A'))

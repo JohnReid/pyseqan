@@ -168,12 +168,6 @@ struct iterator_exposer
         return goDown( it );
     }
 
-    static
-    bool
-    go_down_char( exposed_type & it, alphabet_t c ) {
-        return goDown( it, c );
-    }
-
     /**
      * Descend the iterator following the text in the string. The iterator
      * will be moved as far down the tree as matches the string. Returns
@@ -181,38 +175,40 @@ struct iterator_exposer
      */
     static
     bool
-    go_down_str( exposed_type & it, py::object str ) {
-        using boost::adaptors::transformed;
-        using boost::adaptors::sliced;
-        str = seqanise_string< string_t >( str );
+    go_down_text( exposed_type & it, py::object text ) {
         try {
-            myrrh::python::extract_fn< alphabet_t > extract;
-            const size_t N = py::len( str );
-            size_t n = 0;
-            while( n < N ) {
-                // if we can't match the first character of the rest of our string return false
-                const alphabet_t first = extract( str[ n ] );
-                if( ! goDown( it, first ) ) {
-                    return false;
-                }
-                const size_t edge_len = std::min( parentEdgeLength( it ), N - n );
-                // check we can match the rest of our parent edge
-                if( edge_len > 1 ) {
-                    for( size_t i = 1; edge_len != i; ++i ) {
-                        if( parentEdgeLabel( it )[ i ] != extract( str[ n + i ] ) ) {
-                            return false;
-                        }
-                    }
-                }
-                // increment our index into the string
-                n += edge_len;
+#define SEQAN_CHECK_AND_EXTRACT_TEXT( type ) \
+            { \
+                py::extract< type > extractor( text ); \
+                if( extractor.check() ) { \
+                    return goDown( it, extractor() ); \
+                } \
+            } \
+            /**/
+
+//            // Extract the text into a char if it is of length 1
+//            try {
+//                if( 1 == py::len( text ) ) {
+//                    SEQAN_CHECK_AND_EXTRACT_TEXT( char );
+//                }
+//            } catch ( ... ) {
+//                PyErr_Clear();
+//            }
+            SEQAN_CHECK_AND_EXTRACT_TEXT( string_t );
+            SEQAN_CHECK_AND_EXTRACT_TEXT( infix_t );
+            SEQAN_CHECK_AND_EXTRACT_TEXT( std::string );
+            // only try to extract value type if doesn't have a length or length is 1
+            if( ! PyObject_HasAttrString( text.ptr(), "__len__" ) || 1 == py::len( text ) ) {
+                SEQAN_CHECK_AND_EXTRACT_TEXT( typename Value< string_t >::Type );
             }
+            throw std::logic_error(
+                "Do not know how to go down index for this type." );
+#undef SEQAN_CHECK_AND_EXTRACT_TEXT
         } catch( ... ) {
             // If an exception was thrown, translate it to Python
             boost::python::handle_exception();
-            return false;
         }
-        return true;
+        return false;
     }
 
     static
@@ -250,7 +246,6 @@ struct iterator_exposer
     void
     expose_esa_methods( Class & _class, True && ) {
         _class.add_property( "parentEdgeLabel", parent_edge_label, "The label of the edge from the parent node to this node." );
-        _class.def( "goDownStr", go_down_str, "Iterates down the iterator following the string." );
     }
 
     static
@@ -285,7 +280,7 @@ struct iterator_exposer
         _class.add_property( "value", value, "0 <= value < 2*len(index). Can be used to assign properties to nodes with a property map." );
         _class.add_property( "isRoot", is_root, "Does the iterator point at the root of the index?" );
         _class.def( "goDown", go_down, "Iterates down one edge or a path in a tree." );
-        _class.def( "goDownChar", go_down_char, "Iterates down one edge or a path in a tree which starts with given character." );
+        _class.def( "goDown", go_down_text, "Iterates down one edge or a path in a tree which starts with text." );
         _class.def( "goRight", go_right, "Iterates to the next sibling in a tree." );
         _class.def( "__copy__", __copy__, "Returns a copy of this iterator." );
 

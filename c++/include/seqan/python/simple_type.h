@@ -142,8 +142,8 @@ struct exposer< SimpleType< TValue, TSpec > >
 
     static
     exposed_type
-    _construct( char c ) {
-        return exposed_type( c );
+    fromOrdinal( unsigned i ) {
+        return exposed_type( i );
     }
 
     /** Expose string conversions if value is suitable. */
@@ -159,7 +159,8 @@ struct exposer< SimpleType< TValue, TSpec > >
     void
     expose_string_conversions( Class & _class, seqan::True && ) {
         _class.def( py::init< char >() );
-        _class.def( py::init< int >() );  // make from ordinal value
+        _class.def( "fromOrdinal", fromOrdinal, "Construct from an ordinal value." );
+        _class.staticmethod( "fromOrdinal" );
         _class.def( "__init__", py::make_constructor( make_from_string ) );
         _class.def( "__str__", __str__, "A string representation of this simple type." );
         _class.def( "__hash__", _ordValue, "Hash value." );

@@ -7,7 +7,9 @@ Test simple type functionality.
 """
 
 from seqan import DNA, DNA5, StringDNA5
-import logging, sys
+import logging
+import sys
+
 
 def assert_eq(x1, x2):
     assert x1 == x2, '(%s) %s != %s (%s)' % (type(x1).__name__, x1, x2, type(x2).__name__)
@@ -24,7 +26,7 @@ def check_n(x):
     assert_eq(x, DNA5('N'))
     assert_ne(x, DNA5('G'))
     assert_ne(x, DNA('G'))
-    assert_ne(x, DNA(2))
+    assert_ne(x, DNA.fromOrdinal(2))
 
 
 def check_g(x):
@@ -33,8 +35,8 @@ def check_g(x):
     assert_eq(x, 'G')
     assert_ne(x, DNA5('N'))
     assert_eq(x, DNA5('G'))
-    assert_ne(x, DNA5(4))
-    assert_eq(x, DNA5(2))
+    assert_ne(x, DNA5.fromOrdinal(4))
+    assert_eq(x, DNA5.fromOrdinal(2))
 
 
 def test_n():
@@ -45,7 +47,8 @@ def test_n():
         check_n(x)
     for x in StringDNA5('N'):
         check_n(x)
-        
+
+
 def test_g():
     logging.info(sys._getframe().f_code.co_name)
     check_g(DNA5('G'))
@@ -55,8 +58,17 @@ def test_g():
     for x in StringDNA5('G'):
         check_g(x)
 
+
 def test_dna_against_dna5():
     assert_eq('G', DNA('G'))
     assert_eq('G', DNA5('G'))
     assert_ne(DNA('G'), DNA5('G')) # TODO: would be nice if these compared equal
     assert_eq(DNA('G').ordValue, DNA5('G').ordValue)
+
+
+def test_long_simple_type():
+    try:
+        print DNA('GC')
+        1/0  # Should never reach here
+    except:
+        pass

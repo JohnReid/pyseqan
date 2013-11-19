@@ -26,7 +26,7 @@ def test_representative_equality():
     index = _make_test_index()
     i = index.TopDownIterator(index)
     for n, c in enumerate('ACG'):
-        i.goDownChar(c)
+        i.goDown(c)
         logging.info(i.representative[:n+1])
         assert i.representative[:n+1] == 'ACG'[:n+1]
         assert 'ACG'[:n+1] == i.representative[:n+1]
@@ -34,7 +34,7 @@ def test_representative_equality():
 
 
 def check_go_down_str(i, s, representative):
-    i.goDownStr(s)
+    i.goDown(s)
     assert representative == i.representative
 
 
@@ -42,18 +42,18 @@ def test_go_down_str():
     logging.info(sys._getframe().f_code.co_name)
     index = _make_test_index()
     i = index.TopDownIterator(index)
-    assert copy(i).goDownStr(seqan.StringDNA5('C'))
-    assert copy(i).goDownStr('C')
-    assert not copy(i).goDownStr(seqan.StringDNA5('T'))
-    assert not copy(i).goDownStr('T')
-    assert not copy(i).goDownStr(seqan.StringDNA5('ACGT'))
-    assert copy(i).goDownStr('AC')
-    assert copy(i).goDownStr(seqan.StringDNA5('AC'))
-    assert copy(i).goDownStr(seqan.StringDNA5('ACG'))
-    assert copy(i).goDownStr('AA')
-    assert copy(i).goDownStr('A')
-    assert copy(i).goDownStr('NN')
-    assert copy(i).goDownStr('N')
+    assert copy(i).goDown(seqan.StringDNA5('C'))
+    assert copy(i).goDown('C')
+    assert not copy(i).goDown(seqan.StringDNA5('T'))
+    assert not copy(i).goDown('T')
+    assert not copy(i).goDown(seqan.StringDNA5('ACGT'))
+    assert copy(i).goDown('AC')
+    assert copy(i).goDown(seqan.StringDNA5('AC'))
+    assert copy(i).goDown(seqan.StringDNA5('ACG'))
+    assert copy(i).goDown('AA')
+    assert copy(i).goDown('A')
+    assert copy(i).goDown('NN')
+    assert copy(i).goDown('N')
     check_go_down_str(copy(i), seqan.StringDNA5('ACG'), 'ACG')
     check_go_down_str(copy(i), seqan.StringDNA5('AC' ), 'ACG')
 
@@ -72,13 +72,13 @@ def test_iterator():
     assert not i.representative
     assert i.representative.empty()
 
-    i.goDownChar('A')
+    i.goDown('A')
     assert 'A' == i.representative, i.representative.Value
-    i.goDownChar('C')
+    i.goDown('C')
     assert 'AC' == i.representative
-    i.goDownChar('T')
+    i.goDown('T')
     assert 'ACT' == i.representative
-    i.goDownChar('C')
+    i.goDown('C')
     assert 'ACTC' == i.representative
     logging.info(i.representative)
     assert i.parentEdgeLabel == 'ACTC'[-i.parentEdgeLength:]
@@ -96,9 +96,9 @@ def test_iterator():
     assert j != i
     print i.value.id, j.value.id
     assert j.value == i.value
-    i.goDownChar('C')
+    i.goDown('C')
     assert j.value != i.value
-    j.goDownChar('C')
+    j.goDown('C')
     assert j != i
     assert j.value == i.value
 
@@ -108,7 +108,7 @@ def test_get_occurrences():
     logging.info(sys._getframe().f_code.co_name)
     index = _build_index()
     i = index.TopDownIterator(index)
-    i.goDownChar('C')
+    i.goDown('C')
     occs = i.occurrences
     print type(occs)
     for occ in occs:
@@ -120,7 +120,7 @@ def test_by_value_init():
     logging.info(sys._getframe().f_code.co_name)
     index = _build_index()
     i = index.TopDownIterator(index)
-    i.goDownChar('C')
+    i.goDown('C')
     val = i.value
     j = index.TopDownIterator(index, val)
     assert 'C' == j.representative
