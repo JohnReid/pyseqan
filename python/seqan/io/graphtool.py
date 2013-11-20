@@ -10,51 +10,12 @@ import logging
 logger = logging.getLogger(__name__)
 
 import graph_tool.all as GT
+import seqan
 from copy import copy
 
 
 
-def depthpredicate(maxdepth):
-    """Create a predicate that only descends the tree to a maximum depth.
-    """
-    def predicate(it):
-        return it.repLength < maxdepth
-    return predicate
-
-
-def suffixpredicate(suffix):
-    """Create a predicate that only descends the part of the tree
-    that matches the suffix.
-    """
-    def predicate(it):
-        minlen = min(it.repLength, len(suffix))
-        return suffix[:minlen] == it.representative[:minlen]
-    return predicate
-
-
-class Descender(object):
-    """Mix-in class to descend a suffix tree/array. Base class must implement
-    the _visit_node(parent, child) method. A predicate can be supplied to
-    filter parts of the tree from the descent. See depthpredicate() and
-    suffixpredicate().
-    """
-    def __init__(self, predicate=None):
-        self.predicate = predicate
-
-    def _descend(self, it):
-        """Descend the index adding edges."""
-        if self.predicate is not None and not self.predicate(it):
-            return
-        parent = copy(it)
-        if it.goDown():
-            while True:
-                self._visit_node(parent, it)
-                self._descend(copy(it))
-                if not it.goRight():
-                    break
-
-
-class Builder(Descender):
+class Builder(seqan.Descender):
     """Build a graphtool graph.
     """
 
@@ -96,7 +57,7 @@ class Builder(Descender):
 def edges_in_suffix(builder, suffix):
     """Iterate over the edges in the graph and yield (edge, insuffix).
     """
-    predicate = suffixpredicate(suffix)
+    predicate = seqan.suffixpredicate(suffix)
     for edge in builder.graph.edges():
         index_it = builder.index_iterators[edge.target()]
         yield edge, predicate(index_it)

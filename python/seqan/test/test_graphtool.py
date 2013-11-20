@@ -20,13 +20,15 @@ def test_graphtool():
     #for s in sequences:
     #    s.remove('T')
     index = seqan.IndexStringDNASetESA(sequences)
-    #predicate = seqan.io.graphtool.depthfilter(3)
     suffix = 'ACGTATGC'
-    predicate = seqan.io.graphtool.suffixpredicate(suffix)
+    predicate = seqan.suffixpredicate(suffix)
+    #predicate = seqan.depthpredicate(4)
     builder = seqan.io.graphtool.Builder(index, predicate=predicate)
+    #pos = GT.radial_tree_layout(builder.graph, builder.graph.vertex(0))
+    pos = GT.sfdp_layout(builder.graph)
     GT.graph_draw(
         builder.graph,
-        pos=GT.sfdp_layout(builder.graph),
+        pos=pos,
         vertex_size=2,
         vertex_fill_color="lightgrey",
         vertex_text=builder.occurrences,
