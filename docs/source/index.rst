@@ -15,6 +15,7 @@ Contents
     install
     sequence-types
     indexes
+    io
     apidoc/modules
 
 

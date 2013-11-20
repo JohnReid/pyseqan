@@ -102,6 +102,16 @@ def edges_in_suffix(builder, suffix):
         yield edge, predicate(index_it)
 
 
+def dash_non_suffix_edges(builder, suffix):
+    edge_dash_styles = builder.graph.new_edge_property('object')
+    for edge, insuffix in edges_in_suffix(builder, suffix=suffix):
+        if insuffix:
+            edge_dash_styles[edge] = []
+        else:
+            edge_dash_styles[edge] = [.1,.1,.2]
+    return edge_dash_styles
+
+
 def root_vertex_property(builder, proptype='float', rootvalue=2.):
     """Create a property of type proptype which is only set on the root
     node of the suffix tree.
@@ -125,7 +135,7 @@ def color_edges_by_first_symbol(builder, color_map=None, defaultcolor='black'):
     if color_map is None:
         color_map = {
             'A': [ 80/256., 80/256.,128/256., 1.], 
-            'C': [128/256., 70/256., 37/256., 1.], 
+            'C': [204/256.,163/256.,  0/256., 1.], 
             'G': [128/256., 56/256., 56/256., 1.], 
             'T': [ 80/256.,128/256., 80/256., 1.],
         }
