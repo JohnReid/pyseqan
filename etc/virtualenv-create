@@ -3,7 +3,7 @@
 #
 # Create and activate the virtual environment
 #
-virtualenv virtualenv
+virtualenv --system-site-packages virtualenv
 . virtualenv/bin/activate
 UPDATE="pip install -U"
 
@@ -15,6 +15,7 @@ $UPDATE cookbook
 $UPDATE nose
 $UPDATE sphinx
 $UPDATE sphinx-pypi-upload
+$UPDATE ipython
 
 #
 # Add python directory to path
