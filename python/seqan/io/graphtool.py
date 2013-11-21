@@ -49,6 +49,18 @@ class Builder(seqan.Descender):
         return edge
 
 
+    def map_vertices(self, function, property_map=None, proptype='string'):
+        """Fills in the property map with the values returned from
+        function(iterator).
+        """
+        if property_map is None:
+            property_map = self.graph.new_vertex_property(proptype)
+        for vertex in self.graph.vertices():
+            iterator = self.index_iterators[vertex]
+            property_map[vertex] = function(iterator)
+        return property_map
+
+
     def _visit_node(self, parent, child):
         """Descend the index adding edges."""
         self._add_edge(parent, child)
