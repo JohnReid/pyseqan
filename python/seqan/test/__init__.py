@@ -58,7 +58,7 @@ def show_shallow_tree(i):
         logging.info('%-2s : %5d', i.representative, i.countOccurrences)
         if i.goDown():
             while True:
-                show_shallow_tree(copy(i)) 
+                show_shallow_tree(copy(i))
                 if not i.goRight():
                     break
 
