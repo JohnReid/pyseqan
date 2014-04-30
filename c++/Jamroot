@@ -1,5 +1,5 @@
 #
-# Copyright John Reid 2013
+# Copyright John Reid 2013, 2014
 #
 
 import path ;
@@ -123,7 +123,9 @@ TEST_REQS =
 unit-test test-small-index : src/test/small-index.cpp /site-config//rt : $(TEST_REQS) ;
 explicit test-small-index ;
 
-unit-test test-names : src/test/names.cpp /site-config//rt /site-config//python27 /site-config//z : $(TEST_REQS) ;
+unit-test test-names
+    : src/test/names.cpp /site-config//rt /site-config//python27 /site-config//z
+    : $(TEST_REQS) ;
 
 obj sandbox-range : sandbox/myrrh_boost_range.cpp myrrh//myrrh ;
 explicit sandbox-range ;

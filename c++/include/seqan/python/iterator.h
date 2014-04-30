@@ -224,8 +224,14 @@ struct iterator_exposer
     }
 
     static
+    void
+    setvalue( exposed_type & it, vertex_t v ) {
+        seqan::value( it ) = v;
+    }
+
+    static
     vertex_t
-    value( exposed_type it ) {
+    getvalue( exposed_type it ) {
         return seqan::value( it );
     }
 
@@ -277,7 +283,7 @@ struct iterator_exposer
         _class.add_property( "countOccurrences", count_occurrences, "Number of occurrences of the prefix this iterator represents." );
         _class.add_property( "occurrences", get_occurrences, "All occurrences of the representative substring or a q-gram in the index text." );
         _class.add_property( "countChildren", count_children, "The number of children of this node." );
-        _class.add_property( "value", value, "0 <= value < 2*len(index). Can be used to assign properties to nodes with a property map." );
+        _class.add_property( "value", getvalue, setvalue, "0 <= value < 2*len(index). Can be used to assign properties to nodes with a property map." );
         _class.add_property( "isRoot", is_root, "Does the iterator point at the root of the index?" );
         _class.def( "goDown", go_down, "Iterates down one edge or a path in a tree." );
         _class.def( "goDown", go_down_text, "Iterates down one edge or a path in a tree which starts with text." );
