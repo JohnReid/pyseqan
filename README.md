@@ -6,8 +6,8 @@ sequence analysis library. pyseqan exposes functionality such as enhanced
 suffix arrays via an easy-to-use python interface.
 
 
-Efficiency
-----------
+Efficiency and ease-of-use
+--------------------------
 
 pyseqan is efficient because it uses SeqAn's C++ data structures
 and implementation. However, its python interface is much
@@ -25,6 +25,6 @@ pyseqan currently exposes:
 - Iterators over indexes and sequences
 
 There is much more functionality available through the SeqAn C++ API. pyseqan
-is extensible and will add this functionality as needed. Please make requests
-for additions and any other comments on the
-Github issues page (https://github.com/JohnReid/pyseqan/issues).
+is extensible and this functionality will be added as the need arises. Please
+make requests for additions and any other comments on the Github issues page
+(https://github.com/JohnReid/pyseqan/issues).
