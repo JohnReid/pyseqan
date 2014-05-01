@@ -78,3 +78,11 @@ class Descender(object):
                     break
 
 
+class CallbackDescender(Descender):
+    """Class that descends an index in a top-down manner,
+    calling a callback at each vertex."""
+    def __init__(self, callback, predicate=None):
+        Descender.__init__(self, predicate)
+        self._visit_node = callback
+
+
