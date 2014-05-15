@@ -29,7 +29,7 @@ class Builder(seqan.Descender):
         self.edge_lengths = self.graph.new_edge_property('int')
         self.vertices = dict()
         self.index_iterators = dict()
-        self._descend(index.topdown())
+        self(index)
 
 
     def get_vertex(self, index_it):
@@ -42,11 +42,12 @@ class Builder(seqan.Descender):
 
 
     def _add_edge(self, parent, child):
-        parent_vertex = self.get_vertex(parent)
-        child_vertex  = self.get_vertex(child)
-        edge = self.graph.add_edge(parent_vertex, child_vertex)
-        self.labels[edge] = child.representative[-child.parentEdgeLength:]
-        return edge
+        if parent is not None:
+            parent_vertex = self.get_vertex(parent)
+            child_vertex  = self.get_vertex(child)
+            edge = self.graph.add_edge(parent_vertex, child_vertex)
+            self.labels[edge] = child.representative[-child.parentEdgeLength:]
+            return edge
 
 
     def map_vertices(self, function, property_map=None, proptype='string'):
@@ -107,9 +108,9 @@ def edge_labels_for_output(builder, maxlabellen=3):
 def color_edges_by_first_symbol(builder, color_map=None, defaultcolor='black'):
     if color_map is None:
         color_map = {
-            'A': [ 80/256., 80/256.,128/256., 1.], 
-            'C': [204/256.,163/256.,  0/256., 1.], 
-            'G': [128/256., 56/256., 56/256., 1.], 
+            'A': [ 80/256., 80/256.,128/256., 1.],
+            'C': [204/256.,163/256.,  0/256., 1.],
+            'G': [128/256., 56/256., 56/256., 1.],
             'T': [ 80/256.,128/256., 80/256., 1.],
         }
     edge_colors = builder.graph.new_edge_property('vector<float>')

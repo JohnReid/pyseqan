@@ -1,5 +1,5 @@
 #
-# Copyright John Reid 2013
+# Copyright John Reid 2013, 2014
 #
 
 from __future__ import with_statement
@@ -65,17 +65,21 @@ class Descender(object):
     def __init__(self, predicate=None):
         self.predicate = predicate
 
-    def _descend(self, it):
+    def _descend(self, parent, it):
         """Descend the index adding edges."""
         if self.predicate is not None and not self.predicate(it):
             return
+        self._visit_node(parent, it)
         parent = copy(it)
         if it.goDown():
             while True:
-                self._visit_node(parent, it)
-                self._descend(copy(it))
+                self._descend(parent, copy(it))
                 if not it.goRight():
                     break
+
+    def __call__(self, index):
+        self._descend(None, index.topdown())
+
 
 
 class CallbackDescender(Descender):
