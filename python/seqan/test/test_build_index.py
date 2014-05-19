@@ -13,7 +13,7 @@ from copy import copy
 
 def descend(i):
     if len(i.representative) < 3:
-        logging.info('%-2s : %5d', i.representative, i.countOccurrences)
+        logging.info('%-2s : %5d', i.representative, i.numOccurrences)
         if i.goDown():
             while True:
                 descend(copy(i))

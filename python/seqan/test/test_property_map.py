@@ -19,10 +19,10 @@ def test_property_map():
     property_map = [None] * (2 * len(index))
 
     def set_properties(i):
-        property_map[i.value.id] = i.representative, i.countOccurrences
+        property_map[i.value.id] = i.representative, i.numOccurrences
         if i.goDown():
             while True:
-                set_properties(copy(i)) 
+                set_properties(copy(i))
                 if not i.goRight():
                     break
 
@@ -31,7 +31,7 @@ def test_property_map():
             logging.info('%-2s : %5d', *property_map[i.value.id])
             if i.goDown():
                 while True:
-                    show_properties(copy(i)) 
+                    show_properties(copy(i))
                     if not i.goRight():
                         break
 

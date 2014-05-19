@@ -37,7 +37,7 @@ class Builder(seqan.Descender):
         if result is None:
             result = self.vertices[index_it.value] = self.graph.add_vertex()
             self.index_iterators[result] = copy(index_it)
-            self.occurrences[result] = index_it.countOccurrences
+            self.occurrences[result] = index_it.numOccurrences
         return result
 
 

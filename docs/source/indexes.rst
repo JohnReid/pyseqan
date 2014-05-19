@@ -45,12 +45,12 @@ property is an efficient way to access the length of the representative substrin
     >>> print '"{0}" has length {1}'.format(iterator.representative, iterator.repLength)
     "AC" has length 2
 
-The *countOccurrences* property returns the number of occurrences of the substring in the
+The *numOccurrences* property returns the number of occurrences of the substring in the
 entire string set.
 
 ..  doctest::
 
-    >>> print '"{0}" has {1} occurrences'.format(iterator.representative, iterator.countOccurrences)
+    >>> print '"{0}" has {1} occurrences'.format(iterator.representative, iterator.numOccurrences)
     "AC" has 2 occurrences
 
 

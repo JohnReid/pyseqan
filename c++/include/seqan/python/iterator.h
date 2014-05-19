@@ -280,9 +280,9 @@ struct iterator_exposer
         _class.add_property( "repLength", rep_length, "The length of the representative substring of this iterator." );
         _class.add_property( "representative", get_representative, "A representative substring of this iterator." );
         _class.add_property( "parentEdgeLength", parent_edge_length, "The length of the label of the edge from the parent node to this node." );
-        _class.add_property( "countOccurrences", count_occurrences, "Number of occurrences of the prefix this iterator represents." );
+        _class.add_property( "numOccurrences", count_occurrences, "Number of occurrences of the prefix this iterator represents." );
         _class.add_property( "occurrences", get_occurrences, "All occurrences of the representative substring or a q-gram in the index text." );
-        _class.add_property( "countChildren", count_children, "The number of children of this node." );
+        _class.add_property( "numChildren", count_children, "The number of children of this node." );
         _class.add_property( "value", getvalue, setvalue, "0 <= value < 2*len(index). Can be used to assign properties to nodes with a property map." );
         _class.add_property( "isRoot", is_root, "Does the iterator point at the root of the index?" );
         _class.def( "goDown", go_down, "Iterates down one edge or a path in a tree." );

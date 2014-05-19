@@ -26,7 +26,7 @@ from copy import copy
 
 def _pgf_write_descend(tikz, i, highlightsuffix, maxdepth, only_highlight):
     """Recursion to write PGF::
-        
+
         - tikz: output file
         - i: iterator for current node
         - highlightsuffix: suffix to highlight if not None
@@ -45,14 +45,14 @@ def _pgf_write_descend(tikz, i, highlightsuffix, maxdepth, only_highlight):
     past_end = not is_root and highlightdepth + i.parentEdgeLength <= i.repLength
     on_path = highlightsuffix is not None and highlightsuffix[:shorter_length] == str(i.representative)[:shorter_length]
     last_node = highlightsuffix == str(i.representative)
-    logging.info('%-10s : %5d : %5s %5s', str(i.representative)[:10], i.countOccurrences, on_path, past_end)
+    logging.info('%-10s : %5d : %5s %5s', str(i.representative)[:10], i.numOccurrences, on_path, past_end)
 
     if not is_root:
         print >>tikz, '%schild {' % (indent)
     print >>tikz, '%snode[%s] {}' % (
         indent,
         (on_path and not past_end) and (last_node and 'last node on path' or 'node on path') or 'node off path',
-        #i.countOccurrences
+        #i.numOccurrences
     )
 
     # only go further down if we are on the right path

@@ -55,7 +55,7 @@ def is_debug_python():
 
 def show_shallow_tree(i):
     if len(i.representative) < 3:
-        logging.info('%-2s : %5d', i.representative, i.countOccurrences)
+        logging.info('%-2s : %5d', i.representative, i.numOccurrences)
         if i.goDown():
             while True:
                 show_shallow_tree(copy(i))

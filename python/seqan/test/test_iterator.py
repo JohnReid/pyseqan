@@ -1,5 +1,5 @@
 #
-# Copyright John Reid 2013
+# Copyright John Reid 2013, 2014
 #
 
 """
@@ -69,11 +69,13 @@ def test_iterator():
     index = _build_index()
 
     i = index.TopDownIterator(index)
+    assert i.numOccurrences >= i.numChildren
     assert not i.representative
     assert i.representative.empty()
 
     i.goDown('A')
     assert 'A' == i.representative, i.representative.Value
+    assert i.numOccurrences >= i.numChildren
     i.goDown('C')
     assert 'AC' == i.representative
     i.goDown('T')
