@@ -64,6 +64,18 @@ struct is_esa< Index< TText, IndexEsa<> > > {
 };
 
 
+template< typename TIterator >
+struct is_history {
+    typedef False Type;
+};
+
+
+template< typename TContainer, typename TSpec >
+struct is_history< Iter< TContainer, VSTree< TopDown< ParentLinks< TSpec > > > > > {
+    typedef True Type;
+};
+
+
 } //namespace detail
 
 
@@ -168,6 +180,12 @@ struct iterator_exposer
         return goDown( it );
     }
 
+    static
+    bool
+    go_up( exposed_type & it ) {
+        return goUp( it );
+    }
+
     /**
      * Descend the iterator following the text in the string. The iterator
      * will be moved as far down the tree as matches the string. Returns
@@ -251,23 +269,17 @@ struct iterator_exposer
     static
     void
     expose_esa_methods( Class & _class, True && ) {
-        _class.add_property( "parentEdgeLabel", parent_edge_label, "The label of the edge from the parent node to this node." );
+        _class.add_property(
+                "parentEdgeLabel",
+                parent_edge_label,
+                "The label of the edge from the parent node to this node." );
     }
 
+    template< typename Class >
     static
     void
-    expose() {
-
-        py::class_<
-        exposed_type
-        > _class(
-            name< exposed_type >().c_str(),
-            "Wrapper for C++ SeqAn top down iterator.",
-            py::init< container_t & >(
-                py::arg( "index" ),
-                "Construct the iterator from the index."
-            )[ py::with_custodian_and_ward< 1, 2 >() ]
-        );
+    expose_history_methods( Class & _class, False && ) {
+        // Only expose this constructor for non-history iterators
         _class.def(
             py::init< container_t &, vertex_t >(
                 (
@@ -276,7 +288,31 @@ struct iterator_exposer
                 ),
                 "Construct an iterator to the given vertex in the index."
             )[ py::with_custodian_and_ward< 1, 2 >() ] );
+    }
+
+    template< typename Class >
+    static
+    void
+    expose_history_methods( Class & _class, True && ) {
+        _class.def( "goUp", go_up, "Iterates up one edge to the parent in a tree." );
+    }
+
+    static
+    void
+    expose() {
+
+        py::class_<
+            exposed_type
+        > _class(
+            name< exposed_type >().c_str(),
+            "Wrapper for C++ SeqAn top down iterator.",
+            py::init< container_t & >(
+                py::arg( "index" ),
+                "Construct the iterator from the index."
+            )[ py::with_custodian_and_ward< 1, 2 >() ]
+        );
         expose_esa_methods( _class, typename detail::is_esa< container_t >::Type() );
+        expose_history_methods( _class, typename detail::is_history< exposed_type >::Type() );
         _class.add_property( "repLength", rep_length, "The length of the representative substring of this iterator." );
         _class.add_property( "representative", get_representative, "A representative substring of this iterator." );
         _class.add_property( "parentEdgeLength", parent_edge_length, "The length of the label of the edge from the parent node to this node." );

@@ -1,4 +1,4 @@
-/** Copyright John Reid 2013
+/** Copyright John Reid 2013, 2014
  *
  * \file Exposes seqan parts of STEME algorithm to python.
  */
@@ -13,7 +13,7 @@
  */
 void
 expose_indexes() {
-	using namespace seqan;
+    using namespace seqan;
     using namespace seqan::python;
     //exposer< Index< StringSet< String< char > > > >::expose(); // doesn't compile - TODO: fix
     exposer< Index< StringSet< String< Dna  > > > >::expose();

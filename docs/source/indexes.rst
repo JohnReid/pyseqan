@@ -45,13 +45,36 @@ property is an efficient way to access the length of the representative substrin
     >>> print '"{0}" has length {1}'.format(iterator.representative, iterator.repLength)
     "AC" has length 2
 
-The *numOccurrences* property returns the number of occurrences of the substring in the
+The *numOccurrences* property holds the number of occurrences of the substring in the
 entire string set.
 
 ..  doctest::
 
     >>> print '"{0}" has {1} occurrences'.format(iterator.representative, iterator.numOccurrences)
     "AC" has 2 occurrences
+
+
+The *numChildren* property holds the number of occurrences in the children of this iterator, that
+is it shows how many of the representative substring for this node do not terminate here.
+
+..  doctest::
+
+    >>> print '"{0}" has {1} occurrence in child nodes'.format(iterator.representative, iterator.numChildren)
+    "AC" has 1 occurrence in child nodes
+
+TopDown iterators can go down and right to traverse the entire index from the root node.
+SeqAn also provides an iterator that can go up. This iterator is slightly less efficient so
+should only be used if required.
+
+..  doctest::
+
+    >>> historyiterator = index.topdownhistory()
+    >>> if historyiterator.goDown('AC'):
+    ...     print '"{0}" starts a suffix in our index'.format(historyiterator.representative)
+    ...     if historyiterator.goUp():
+    ...         print '"{0}" starts a suffix in our index'.format(historyiterator.representative)
+    "AC" starts a suffix in our index
+    "A" starts a suffix in our index
 
 
 Vertexes

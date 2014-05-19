@@ -202,6 +202,7 @@ struct exposer< Index< TText, TSpec > > {
     typedef typename Infix< sa_fibre_t const >::Type            sa_infix_t;
     typedef typename Value< sa_infix_t >::Type                  sa_value_t;
     typedef typename Iterator< exposed_type, TopDown<> >::Type  top_down_it;
+    typedef typename Iterator< exposed_type, TopDown< ParentLinks< Postorder > > >::Type  top_down_history_it;
 
 
     /**
@@ -261,6 +262,16 @@ struct exposer< Index< TText, TSpec > > {
         return top_down_it( index );
     }
 
+
+    /**
+     * A top down history iterator for the index.
+     */
+    static
+    top_down_history_it
+    topdownhistory( exposed_type & index ) {
+        return top_down_history_it( index );
+    }
+
     /**
      * Save the index.
      */
@@ -306,10 +317,12 @@ struct exposer< Index< TText, TSpec > > {
         _class.def( "load", load, "Load the index." );
         _class.staticmethod( "load" );
         _class.def( "topdown", topdown, "A top down iterator for the index." );
+        _class.def( "topdownhistory", topdownhistory, "A top down history iterator for the index." );
         _class.def( "__len__", __len__, "The length of the index." );
         _class.add_property( "text", py::make_function( text, py::return_internal_reference<>() ), "The text of the index." );
 
         iterator_exposer< top_down_it >().ensure_exposed_and_add_as_attr( _class, "TopDownIterator" );
+        iterator_exposer< top_down_history_it >().ensure_exposed_and_add_as_attr( _class, "TopDownHistoryIterator" );
         exposer< sa_infix_t >().ensure_exposed_and_add_as_attr( _class, "Infix" );
         exposer< vertex_t >().ensure_exposed_and_add_as_attr( _class, "Vertex" );
     }
