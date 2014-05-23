@@ -148,28 +148,53 @@ is_vertex< VertexFmi< TValue, T > > {
 };
 
 
+template< typename exposed_type >
+bool
+vertex_equality( exposed_type const & v, exposed_type const & w ) {
+    return _getId( v ) == _getId( w );
+}
+
+
+
 } //namespace detail
+
 
 
 template< typename Exposed >
 struct exposer< Exposed, SEQAN_FUNC_ENABLE_IF( detail::is_vertex< Exposed >, void ) >
 : myrrh::python::ensure_exposer< exposer< Exposed > >
 {
-    typedef Exposed                               exposed_type;
-    typedef typename Size< exposed_type >::Type   size_type;
+    typedef Exposed                                 exposed_type;
+    typedef typename Size< exposed_type >::Type     size_type;
+    typedef typename Id< exposed_type const >::Type id_type;
 
 
     static
-    bool
-    __eq__( exposed_type const & v, exposed_type const & w ) {
-        return _getId( v ) == _getId( w );
+    id_type
+    id( exposed_type const & v ) {
+        return _getId( v );
     }
 
 
-    static
-    size_type
-    id( exposed_type const & v ) {
-        return _getId( v );
+    template< typename U=id_type >
+    typename std::enable_if< ! std::is_convertible< U, size_type >::value >::type
+    expose_id_methods( py::class_< exposed_type > & )
+    { }
+
+
+    template< typename U=id_type >
+    typename std::enable_if< std::is_convertible< U, size_type >::value >::type
+    expose_id_methods( py::class_< exposed_type > & class_ )
+    {
+        class_.def(
+            "__eq__",
+            detail::vertex_equality< exposed_type >,
+            "Tests equality." );
+        class_.def( "__hash__", id, "Hash function." );
+        class_.add_property(
+            "id",
+            id,
+            "The id of this vertex. Can be used as an index into a property map." );
     }
 
 
@@ -180,9 +205,7 @@ struct exposer< Exposed, SEQAN_FUNC_ENABLE_IF( detail::is_vertex< Exposed >, voi
             "A vertex in an index.",
             py::no_init
         );
-        class_.add_property( "id", id, "The id of this vertex. Can be used as an index into a property map." );
-        class_.def( "__eq__", __eq__, "Tests equality." );
-        class_.def( "__hash__", id, "Hash function." );
+        expose_id_methods( class_ );
     }
 };
 

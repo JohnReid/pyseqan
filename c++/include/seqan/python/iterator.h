@@ -204,17 +204,10 @@ struct iterator_exposer
             } \
             /**/
 
-//            // Extract the text into a char if it is of length 1
-//            try {
-//                if( 1 == py::len( text ) ) {
-//                    SEQAN_CHECK_AND_EXTRACT_TEXT( char );
-//                }
-//            } catch ( ... ) {
-//                PyErr_Clear();
-//            }
             SEQAN_CHECK_AND_EXTRACT_TEXT( string_t );
             SEQAN_CHECK_AND_EXTRACT_TEXT( infix_t );
-            SEQAN_CHECK_AND_EXTRACT_TEXT( std::string );
+            SEQAN_CHECK_AND_EXTRACT_TEXT( const char * );
+            //SEQAN_CHECK_AND_EXTRACT_TEXT( std::string );
             // only try to extract value type if doesn't have a length or length is 1
             if( ! PyObject_HasAttrString( text.ptr(), "__len__" ) || 1 == py::len( text ) ) {
                 SEQAN_CHECK_AND_EXTRACT_TEXT( typename Value< string_t >::Type );

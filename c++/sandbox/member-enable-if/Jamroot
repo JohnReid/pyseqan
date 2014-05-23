@@ -1,0 +1,5 @@
+project : requirements <include>$(SEQAN_ROOT) ;
+
+exe test : test.cpp /site-config//seqan /site-config//rt ;
+
+
