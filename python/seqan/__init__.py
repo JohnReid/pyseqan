@@ -77,8 +77,11 @@ class Descender(object):
                 if not it.goRight():
                     break
 
-    def __call__(self, index):
-        self._descend(None, index.topdown())
+    def __call__(self, index, history=False):
+        if history:
+            self._descend(None, index.topdownhistory())
+        else:
+            self._descend(None, index.topdown())
 
 
 
