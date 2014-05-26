@@ -1,4 +1,4 @@
-/** Copyright John Reid 2013
+/** Copyright John Reid 2013, 2014
  *
  * \file
  * \brief Code to expose iterators.
@@ -255,22 +255,6 @@ struct iterator_exposer
     template< typename Class >
     static
     void
-    expose_esa_methods( Class & _class, False && ) {
-    }
-
-    template< typename Class >
-    static
-    void
-    expose_esa_methods( Class & _class, True && ) {
-        _class.add_property(
-                "parentEdgeLabel",
-                parent_edge_label,
-                "The label of the edge from the parent node to this node." );
-    }
-
-    template< typename Class >
-    static
-    void
     expose_history_methods( Class & _class, False && ) {
         // Only expose this constructor for non-history iterators
         _class.def(
@@ -304,7 +288,10 @@ struct iterator_exposer
                 "Construct the iterator from the index."
             )[ py::with_custodian_and_ward< 1, 2 >() ]
         );
-        expose_esa_methods( _class, typename detail::is_esa< container_t >::Type() );
+        _class.add_property(
+                "parentEdgeLabel",
+                parent_edge_label,
+                "The label of the edge from the parent node to this node." );
         expose_history_methods( _class, typename detail::is_history< exposed_type >::Type() );
         _class.add_property( "repLength", rep_length, "The length of the representative substring of this iterator." );
         _class.add_property( "representative", get_representative, "A representative substring of this iterator." );

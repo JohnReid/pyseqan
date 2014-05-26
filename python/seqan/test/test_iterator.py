@@ -12,13 +12,27 @@ import logging
 import sys
 from copy import copy
 
+# The different indexes we want to test
+Indexes = (seqan.IndexStringDNA5SetESA, seqan.IndexStringDNA5SetWOTD)
 
-def _make_test_index():
+
+def iteratortypesforindex(Index):
+    yield Index.TopDownIterator
+    yield Index.TopDownHistoryIterator
+
+
+def indexiteratorcombos():
+    for Index in Indexes:
+        for Iterator in iteratortypesforindex(Index):
+            yield Index, Iterator
+
+
+def _make_test_string_set():
     strings = seqan.StringDNA5Set()
     strings.appendValue(seqan.StringDNA5('ACG'))
     strings.appendValue(seqan.StringDNA5('AA'))
     strings.appendValue(seqan.StringDNA5('NN'))
-    return seqan.IndexStringDNA5SetESA(strings)
+    return strings
 
 
 def _test_representative_equality(index, Iterator):
@@ -32,9 +46,9 @@ def _test_representative_equality(index, Iterator):
 
 def test_representative_equality():
     logging.info(sys._getframe().f_code.co_name)
-    index = _make_test_index()
-    _test_representative_equality(index, index.TopDownIterator)
-    _test_representative_equality(index, index.TopDownHistoryIterator)
+    for Index, Iterator in indexiteratorcombos():
+        index = Index(_make_test_string_set())
+        _test_representative_equality(index, Iterator)
 
 
 def test_go_up():
@@ -89,15 +103,16 @@ def _test_go_down_str(index, Iterator):
 
 def test_go_down_str():
     logging.info(sys._getframe().f_code.co_name)
-    index = _make_test_index()
-    _test_go_down_str(index, index.TopDownIterator)
-    _test_go_down_str(index, index.TopDownHistoryIterator)
+    for Index, Iterator in indexiteratorcombos():
+        index = Index(_make_test_string_set())
+        _test_go_down_str(index, Iterator)
 
 
 def _build_index():
     _num_bases, sequences, _ids = seqan.readFastaDNA5(fasta_file('dm01r.fasta'))
     logging.info('Building index')
-    return seqan.IndexStringDNA5SetESA(sequences)
+    for Index in Indexes:
+        yield Index(sequences)
 
 
 def _test_iterator(index, Iterator):
@@ -125,24 +140,25 @@ def _test_iterator(index, Iterator):
     del index
     print r
 
-    index = _build_index()
-    i = Iterator(index)
-    j = Iterator(index)
-    assert j != i
-    print i.value.id, j.value.id
-    assert j.value == i.value
-    i.goDown('C')
-    assert j.value != i.value
-    j.goDown('C')
-    assert j != i
-    assert j.value == i.value
+    for index in _build_index():
+        for Iterator in iteratortypesforindex(index):
+            i = Iterator(index)
+            j = Iterator(index)
+            assert j != i
+            print i.value.id, j.value.id
+            assert j.value == i.value
+            i.goDown('C')
+            assert j.value != i.value
+            j.goDown('C')
+            assert j != i
+            assert j.value == i.value
 
 
 def test_iterator():
     logging.info(sys._getframe().f_code.co_name)
-    index = _build_index()
-    _test_iterator(index, index.TopDownIterator)
-    _test_iterator(index, index.TopDownHistoryIterator)
+    for index in _build_index():
+        for Iterator in iteratortypesforindex(index):
+            _test_iterator(index, Iterator)
 
 
 def _test_get_occurrences(index, Iterator):
@@ -158,20 +174,20 @@ def _test_get_occurrences(index, Iterator):
 def test_get_occurrences():
     """Test getting iterator occurrences"""
     logging.info(sys._getframe().f_code.co_name)
-    index = _build_index()
-    _test_get_occurrences(index, index.TopDownIterator)
-    _test_get_occurrences(index, index.TopDownHistoryIterator)
+    for index in _build_index():
+        for Iterator in iteratortypesforindex(index):
+            _test_get_occurrences(index, Iterator)
 
 
 def test_by_value_init():
     """Test by-value initialisation"""
     logging.info(sys._getframe().f_code.co_name)
-    index = _build_index()
-    i = index.TopDownIterator(index)
-    i.goDown('C')
-    val = i.value
-    j = index.TopDownIterator(index, val)
-    assert 'C' == j.representative
+    for index in _build_index():
+        i = index.TopDownIterator(index)
+        i.goDown('C')
+        val = i.value
+        j = index.TopDownIterator(index, val)
+        assert 'C' == j.representative
 
     del index
     logging.info(j.representative)
