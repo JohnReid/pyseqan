@@ -27,6 +27,14 @@ def indexiteratorcombos():
             yield Index, Iterator
 
 
+def make_string_set(seqs):
+    """Make a string set of the given type from the python sequences."""
+    strings = seqan.StringDNA5Set()
+    for seq in seqs:
+        strings.appendValue(seqan.StringDNA5(seq))
+    return strings
+
+
 def _make_test_string_set():
     strings = seqan.StringDNA5Set()
     strings.appendValue(seqan.StringDNA5('ACG'))
@@ -193,5 +201,46 @@ def test_by_value_init():
     logging.info(j.representative)
 
 
-if '__main__' == __name__:
-    test_get_occurrences()
+class TestParallelDescender(seqan.ParallelDescender):
+    def __init__(self, secondaryidx):
+        self.secondaryidx = secondaryidx
+
+    def _visit_node(self, primaryit, secondaryit):
+        logging.debug("%10s : %10s", primaryit.representative, secondaryit.representative)
+        it = self.secondaryidx.topdown()
+        for b in primaryit.representative:
+            if not it.goDown(b):
+                break
+        length = min(primaryit.repLength, it.repLength)
+        if it.isRoot:
+            repWoParentLen = 0
+        else:
+            repWoParentLen = it.repLength - it.parentEdgeLength
+        assert it.representative[:repWoParentLen] \
+            == primaryit.representative[:repWoParentLen]
+
+
+
+sequence_sets = (
+    ('ACGT', 'AAAA'),
+    ('AC', 'AA', 'ACGTTT'),
+    ('ACGT'),
+    ('AC', 'AA', 'ACGTTT', 'GCGCCC'),
+)
+
+
+def test_parallel_descender():
+    for primaryseqs in sequence_sets:
+        for secondaryseqs in sequence_sets:
+            for seq in primaryseqs:
+                logging.info('  Primary: %s', seq)
+            for seq in secondaryseqs:
+                logging.info('Secondary: %s', seq)
+            primaryindex = seqan.IndexStringDNA5SetESA(make_string_set(primaryseqs))
+            secondaryindex = seqan.IndexStringDNA5SetESA(make_string_set(secondaryseqs))
+            TestParallelDescender(secondaryindex).descend(
+                primaryindex.topdown(), secondaryindex.topdown())
+
+
+        if '__main__' == __name__:
+            test_get_occurrences()

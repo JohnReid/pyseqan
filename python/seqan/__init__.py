@@ -93,3 +93,31 @@ class CallbackDescender(Descender):
         self._visit_node = callback
 
 
+class ParallelDescender(object):
+    """Descends two indexes (primary and secondary) in parallel. Each vertex in
+    the primary is visited and the corresponding vertices (or closest vertices)
+    in the secondary are simultaneously visited.
+    """
+    def descend(self, primaryit, secondaryit):
+        self._visit_node(primaryit, secondaryit)
+        secondaryahead = secondaryit.repLength - primaryit.repLength
+        if primaryit.goDown():
+            while True:
+                # Only move the secondary iterator if we are still
+                # synchronised with primary iterator
+                if secondaryahead >= 0:
+                    # Move model iterator to same (or similar) position
+                    # as sequences iterator
+                    newsecondaryit = copy(secondaryit)
+                    for b in primaryit.parentEdgeLabel[secondaryahead:]:
+                        if not newsecondaryit.goDown(b):
+                            break
+                else:
+                    # Don't bother copying if we are not moving it
+                    newsecondaryit = secondaryit
+                # recurse
+                self.descend(copy(primaryit), newsecondaryit)
+                if not primaryit.goRight():
+                    break
+
+
