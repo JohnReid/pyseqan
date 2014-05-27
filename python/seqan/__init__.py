@@ -5,7 +5,6 @@
 from __future__ import with_statement
 
 import pkg_resources
-from copy import copy
 
 __doc__ = pkg_resources.resource_string(__name__, "README")
 __license__ = pkg_resources.resource_string(__name__, "LICENSE")
@@ -70,10 +69,10 @@ class Descender(object):
         if self.predicate is not None and not self.predicate(it):
             return
         self._visit_node(parent, it)
-        parent = copy(it)
+        parent = it.copy()
         if it.goDown():
             while True:
-                self._descend(parent, copy(it))
+                self._descend(parent, it.copy())
                 if not it.goRight():
                     break
 
@@ -126,7 +125,7 @@ class ParallelDescender(object):
                 if newstillsynced:
                     # Move secondary iterator to same (or similar) position
                     # as primary iterator
-                    newsecit = copy(secit)
+                    newsecit = secit.copy()
                     while newsecit.repLength < primit.repLength:
                         # Try and descend
                         if not newsecit.goDown(
@@ -146,7 +145,7 @@ class ParallelDescender(object):
                     # Don't bother copying if we are not altering it
                     newsecit = secit
                 # recurse
-                self.descend(copy(primit), newsecit, newstillsynced)
+                self.descend(primit.copy(), newsecit, newstillsynced)
                 # Go to next vertex in primary index
                 if not primit.goRight():
                     break
@@ -165,11 +164,11 @@ def findsuffixes(it, callback):
     """Counts all complete suffixes below the vertex represented by the iterator.
     Calls the callback(it, count) whenever the count > 0."""
     count = it.numOccurrences
-    copyit = copy(it)
+    copyit = it.copy()
     if it.goDown():
         while True:
             count -= it.numOccurrences
-            findsuffixes(copy(it), callback)
+            findsuffixes(it.copy(), callback)
             if not it.goRight():
                 break
     if count > 0:
