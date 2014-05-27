@@ -10,6 +10,7 @@ from seqan.test import fasta_file
 import seqan
 import logging
 import sys
+import time
 from copy import copy
 
 # The different indexes we want to test
@@ -121,6 +122,64 @@ def _build_index():
     logging.info('Building index')
     for Index in Indexes:
         yield Index(sequences)
+
+
+class DescenderTest(object):
+    def __init__(self):
+        self.n = 0
+
+    def descend(self, it):
+        """Descend the index."""
+        self.n += 1
+        if it.goDown():
+            while True:
+                self.descend(copy(it))
+                if not it.goRight():
+                    break
+
+    def descendhistory(self, it):
+        """Descend the index."""
+        self.n += 1
+        if it.goDown():
+            while True:
+                self.descendhistory(it)
+                if not it.goRight():
+                    break
+            it.goUp()
+
+
+def test_compare_history_and_non_history():
+    for Index in Indexes:
+        for seqs in sequence_sets:
+            index = Index(make_string_set(seqs))
+            descendertopdown = DescenderTest()
+            descendertopdown.descend(index.topdown())
+            descendertopdownhistory = DescenderTest()
+            descendertopdownhistory.descendhistory(index.topdownhistory())
+            assert descendertopdown.n == descendertopdownhistory.n
+
+
+def _test_iterator_speed():
+    numdescents = 10
+    def visitnode(parent, it):
+        pass
+    def timeit(method, history):
+        start = time.time()
+        for i in xrange(numdescents):
+            descender = DescenderTest()
+            method(descender, history and index.topdownhistory() or index.topdown())
+            assert descender.n == 9766, descender.n
+        end = time.time()
+        return (end-start)/numdescents
+    for index in _build_index():
+        for history in (True, False):
+            t = timeit(DescenderTest.descend, history)
+            logging.info('%.4fs with history=%-8s for %s', t, history, index)
+            if history:
+                t = timeit(DescenderTest.descendhistory, True)
+                logging.info('%.4fs with descendhistory() for %s', t, index)
+
+
 
 
 def _test_iterator(index, Iterator):
@@ -251,4 +310,6 @@ def test_parallel_descender():
 
 
 if '__main__' == __name__:
-    test_get_occurrences()
+    logging.basicConfig(level=logging.INFO)
+    _test_iterator_speed()
+    #test_get_occurrences()

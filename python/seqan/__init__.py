@@ -15,6 +15,8 @@ __version__ = '%d.%d' % (__major_version__, __minor_version__)
 
 from ._build import *
 
+from copy import copy
+
 logger = logging.getLogger(__name__)
 try:
     logging.captureWarnings(True)
@@ -69,10 +71,10 @@ class Descender(object):
         if self.predicate is not None and not self.predicate(it):
             return
         self._visit_node(parent, it)
-        parent = it.copy()
+        parent = copy(it)
         if it.goDown():
             while True:
-                self._descend(parent, it.copy())
+                self._descend(parent, copy(it))
                 if not it.goRight():
                     break
 
@@ -125,7 +127,7 @@ class ParallelDescender(object):
                 if newstillsynced:
                     # Move secondary iterator to same (or similar) position
                     # as primary iterator
-                    newsecit = secit.copy()
+                    newsecit = copy(secit)
                     while newsecit.repLength < primit.repLength:
                         # Try and descend
                         if not newsecit.goDown(
@@ -145,7 +147,7 @@ class ParallelDescender(object):
                     # Don't bother copying if we are not altering it
                     newsecit = secit
                 # recurse
-                self.descend(primit.copy(), newsecit, newstillsynced)
+                self.descend(copy(primit), newsecit, newstillsynced)
                 # Go to next vertex in primary index
                 if not primit.goRight():
                     break
