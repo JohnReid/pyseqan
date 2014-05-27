@@ -51,7 +51,7 @@ rm -rf docs/source/apidoc/
 sphinx-apidoc -H pyseqan -A "John Reid" -o docs/source/apidoc python/
 python setup.py build_sphinx
 python setup.py upload_sphinx
-#scp -r docs/build/html/* $HOST:$DIR/docs/build/html/
+scp -r docs/build/html/* $HOST:$DIR/docs/build/html/
 
 
 #
@@ -59,7 +59,7 @@ python setup.py upload_sphinx
 #
 python setup.py sdist upload --sign
 PACKAGE=$(ls -rt dist|grep -v asc|tail -1) # get the latest package in dist/
-#scp dist/$PACKAGE $HOST:$DIR/dist/
+scp dist/$PACKAGE $HOST:$DIR/dist/
 
 
 #
