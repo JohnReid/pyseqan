@@ -265,6 +265,8 @@ struct iterator_exposer
                 ),
                 "Construct an iterator to the given vertex in the index."
             )[ py::with_custodian_and_ward< 1, 2 >() ] );
+        // only make it easy for non-history iterators to make copies
+        _class.def( "copy", __copy__, "Returns a copy of this iterator." );
     }
 
     template< typename Class >
@@ -305,7 +307,6 @@ struct iterator_exposer
         _class.def( "goDown", go_down_text, "Iterates down one edge or a path in a tree which starts with text." );
         _class.def( "goRight", go_right, "Iterates to the next sibling in a tree." );
         _class.def( "__copy__", __copy__, "Returns a copy of this iterator." );
-        _class.def( "copy", __copy__, "Returns a copy of this iterator." );
 
         exposer< infix_t >().ensure_exposed_and_add_as_attr( _class, "Representative" );
         exposer< sa_infix_t >().ensure_exposed_and_add_as_attr( _class, "Occurrences" );
