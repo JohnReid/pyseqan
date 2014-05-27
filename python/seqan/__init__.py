@@ -96,28 +96,81 @@ class CallbackDescender(Descender):
 class ParallelDescender(object):
     """Descends two indexes (primary and secondary) in parallel. Each vertex in
     the primary is visited and the corresponding vertices (or closest vertices)
-    in the secondary are simultaneously visited.
+    in the secondary are simultaneously visited. The two iterators are called
+    synchronised if and only if the representative of the primary iterator
+    matches that start of the representative of the secondary iterator.
     """
-    def descend(self, primaryit, secondaryit):
-        self._visit_node(primaryit, secondaryit)
-        secondaryahead = secondaryit.repLength - primaryit.repLength
-        if primaryit.goDown():
+    def descend(self, primit, secit, stillsynced=True):
+        self._visit_node(primit, secit, stillsynced)
+        if stillsynced != (
+            primit.repLength <= secit.repLength
+            and primit.representative == secit.representative[:primit.repLength]):
+            1/0
+        assert stillsynced == (
+            primit.repLength <= secit.repLength
+            and primit.representative == secit.representative[:primit.repLength])
+        if primit.goDown():
             while True:
+                # We have moved the primary iterator,
+                # we should check if we are still synchronised
+                if stillsynced:
+                    parentstart = primit.repLength - primit.parentEdgeLength
+                    end = min(primit.repLength, secit.repLength)
+                    newstillsynced = (
+                        primit.representative[parentstart:end]
+                        == secit.representative[parentstart:end])
+                else:
+                    newstillsynced = False
                 # Only move the secondary iterator if we are still
                 # synchronised with primary iterator
-                if secondaryahead >= 0:
-                    # Move model iterator to same (or similar) position
-                    # as sequences iterator
-                    newsecondaryit = copy(secondaryit)
-                    for b in primaryit.parentEdgeLabel[secondaryahead:]:
-                        if not newsecondaryit.goDown(b):
+                if newstillsynced:
+                    # Move secondary iterator to same (or similar) position
+                    # as primary iterator
+                    newsecit = copy(secit)
+                    while newsecit.repLength < primit.repLength:
+                        # Try and descend
+                        if not newsecit.goDown(
+                                primit.representative[newsecit.repLength]):
+                            #logger.debug('Could not goDown()')
+                            newstillsynced = False
+                            break
+                        # Check we descended successfully
+                        start = newsecit.repLength - newsecit.parentEdgeLength + 1
+                        end = min(primit.repLength, newsecit.repLength)
+                        if newsecit.representative[start:end] != primit.representative[start:end]:
+                            # We did not manage to match primary's parent edge
+                            #logger.debug('Parent edge mismatch')
+                            newstillsynced = False
                             break
                 else:
-                    # Don't bother copying if we are not moving it
-                    newsecondaryit = secondaryit
+                    # Don't bother copying if we are not altering it
+                    newsecit = secit
                 # recurse
-                self.descend(copy(primaryit), newsecondaryit)
-                if not primaryit.goRight():
+                self.descend(copy(primit), newsecit, newstillsynced)
+                # Go to next vertex in primary index
+                if not primit.goRight():
                     break
 
 
+
+class CallbackParallelDescender(ParallelDescender):
+    """Class that descends two indexes in a top-down manner,
+    calling a callback at each vertex."""
+    def __init__(self, callback):
+        ParallelDescender.__init__(self)
+        self._visit_node = callback
+
+
+def findsuffixes(it, callback):
+    """Counts all complete suffixes below the vertex represented by the iterator.
+    Calls the callback(it, count) whenever the count > 0."""
+    count = it.numOccurrences
+    copyit = copy(it)
+    if it.goDown():
+        while True:
+            count -= it.numOccurrences
+            findsuffixes(copy(it), callback)
+            if not it.goRight():
+                break
+    if count > 0:
+        callback(copyit, count)

@@ -205,23 +205,30 @@ class TestParallelDescender(seqan.ParallelDescender):
     def __init__(self, secondaryidx):
         self.secondaryidx = secondaryidx
 
-    def _visit_node(self, primaryit, secondaryit):
-        logging.debug("%10s : %10s", primaryit.representative, secondaryit.representative)
+    def _visit_node(self, primaryit, secondaryit, stillsynced):
+        logging.debug("%-10s : %-10s : %s",
+            primaryit.representative, secondaryit.representative,
+            stillsynced and "    synced" or "not synced")
+        # Descend secondary index from top as far as we can whilst
+        # matching primary representative
         it = self.secondaryidx.topdown()
-        for b in primaryit.representative:
-            if not it.goDown(b):
+        while it.repLength < primaryit.repLength and \
+                it.goDown(primaryit.representative[it.repLength]):
+            if it.representative[:it.repLength] != primaryit.representative[:it.repLength]:
                 break
-        length = min(primaryit.repLength, it.repLength)
-        if it.isRoot:
-            repWoParentLen = 0
-        else:
-            repWoParentLen = it.repLength - it.parentEdgeLength
-        assert it.representative[:repWoParentLen] \
-            == primaryit.representative[:repWoParentLen]
+        # Make sure still synced matches reality
+        assert (it.representative[:primaryit.repLength] == primaryit.representative) \
+            == stillsynced
+        if (secondaryit.representative[:primaryit.repLength] == primaryit.representative) \
+            != stillsynced: 1/0
 
 
 
 sequence_sets = (
+    ('GGCAAT', 'GGCAAA'),
+    ('ACGT', 'ACTG'),
+    ('TGGCAA', 'AGGCAA'),
+    ('ACCGT', 'ACCTG'),
     ('ACGT', 'AAAA'),
     ('AC', 'AA', 'ACGTTT'),
     ('ACGT'),
@@ -240,7 +247,8 @@ def test_parallel_descender():
             secondaryindex = seqan.IndexStringDNA5SetESA(make_string_set(secondaryseqs))
             TestParallelDescender(secondaryindex).descend(
                 primaryindex.topdown(), secondaryindex.topdown())
+            #if primaryseqs != secondaryseqs: 1/0  # Just for debugging
 
 
-        if '__main__' == __name__:
-            test_get_occurrences()
+if '__main__' == __name__:
+    test_get_occurrences()
