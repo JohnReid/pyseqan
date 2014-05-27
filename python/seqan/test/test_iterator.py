@@ -10,6 +10,7 @@ from seqan.test import fasta_file
 import seqan
 import logging
 import sys
+from copy import copy
 
 # The different indexes we want to test
 Indexes = (seqan.IndexStringDNA5SetESA, seqan.IndexStringDNA5SetWOTD)
@@ -69,7 +70,7 @@ def test_go_up():
     index = seqan.IndexStringDNA5SetESA(strings)
     i = index.TopDownHistoryIterator(index)
     i.goDown('ACGT')
-    j = i.copy()
+    j = copy(i)
     assert 'ACGT' == j.representative
     j.goUp()
     assert 'ACG'  == j.representative
@@ -92,20 +93,20 @@ def check_go_down_str(i, s, representative):
 
 def _test_go_down_str(index, Iterator):
     i = Iterator(index)
-    assert i.copy().goDown(seqan.StringDNA5('C'))
-    assert i.copy().goDown('C')
-    assert not i.copy().goDown(seqan.StringDNA5('T'))
-    assert not i.copy().goDown('T')
-    assert not i.copy().goDown(seqan.StringDNA5('ACGT'))
-    assert i.copy().goDown('AC')
-    assert i.copy().goDown(seqan.StringDNA5('AC'))
-    assert i.copy().goDown(seqan.StringDNA5('ACG'))
-    assert i.copy().goDown('AA')
-    assert i.copy().goDown('A')
-    assert i.copy().goDown('NN')
-    assert i.copy().goDown('N')
-    check_go_down_str(i.copy(), seqan.StringDNA5('ACG'), 'ACG')
-    check_go_down_str(i.copy(), seqan.StringDNA5('AC' ), 'ACG')
+    assert copy(i).goDown(seqan.StringDNA5('C'))
+    assert copy(i).goDown('C')
+    assert not copy(i).goDown(seqan.StringDNA5('T'))
+    assert not copy(i).goDown('T')
+    assert not copy(i).goDown(seqan.StringDNA5('ACGT'))
+    assert copy(i).goDown('AC')
+    assert copy(i).goDown(seqan.StringDNA5('AC'))
+    assert copy(i).goDown(seqan.StringDNA5('ACG'))
+    assert copy(i).goDown('AA')
+    assert copy(i).goDown('A')
+    assert copy(i).goDown('NN')
+    assert copy(i).goDown('N')
+    check_go_down_str(copy(i), seqan.StringDNA5('ACG'), 'ACG')
+    check_go_down_str(copy(i), seqan.StringDNA5('AC' ), 'ACG')
 
 
 def test_go_down_str():
