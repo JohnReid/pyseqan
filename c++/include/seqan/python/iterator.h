@@ -247,11 +247,18 @@ struct iterator_exposer
     }
 
     static
+    vertex_t
+    node_up( exposed_type it ) {
+        return seqan::nodeUp( it );
+    }
+
+    static
     bool
     is_root( exposed_type it ) {
         return isRoot( it );
     }
 
+    // specialisation for non-TopDownHistory iterators
     template< typename Class >
     static
     void
@@ -269,11 +276,14 @@ struct iterator_exposer
         _class.def( "copy", __copy__, "Returns a copy of this iterator." );
     }
 
+    // specialisation for TopDownHistory iterators
     template< typename Class >
     static
     void
     expose_history_methods( Class & _class, True && ) {
+        _class.def( "copy", __copy__, "Returns a copy of this iterator." );
         _class.def( "goUp", go_up, "Iterates up one edge to the parent in a tree." );
+        _class.add_property( "nodeUp", node_up, "The vertex descriptor of the parent node." );
     }
 
     static
