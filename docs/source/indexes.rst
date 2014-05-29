@@ -1,3 +1,4 @@
+.. _indexes:
 
 Indexes
 =======
@@ -16,6 +17,8 @@ set easily.
     >>> seqs = seqan.StringDNASet(('ACGT', 'AAAA', 'GGGG', 'AC'))
     >>> index = seqan.IndexStringDNASetESA(seqs)
 
+
+.. _iterators:
 
 Iterators
 ---------
@@ -75,6 +78,8 @@ SeqAn also provides a top-down-history iterator that can go up.
     "AC" starts a suffix in our index
     "A" starts a suffix in our index
 
+
+.. _traversal:
 
 Traversal
 ---------

@@ -10,6 +10,8 @@ Input/Output
 
 
 
+.. _disk-io:
+
 Saving and loading
 ------------------
 
@@ -42,8 +44,10 @@ uninitialised state. Indexes can be restored from disk using the *load()* method
 
 
 
-Diagrams
---------
+.. _graphical:
+
+Graphical output
+----------------
 
 If you have the graph-tool_ package installed, you can use it to create graphs
 that represent suffix trees or arrays. The graphs can be saved to various

@@ -70,7 +70,7 @@ def depthfirsttraversal(index, visitvertex):
     return it
 
 
-def topdownparallel(primit, secit, visitvertex, stillsynced=True):
+def topdownparalleltraversal(primit, secit, visitvertex, stillsynced=True):
     """Descends two top-down-history iterators (primary and secondary) in parallel.
 
     Each vertex in the primary index is visited and the corresponding vertices
@@ -120,7 +120,7 @@ def topdownparallel(primit, secit, visitvertex, stillsynced=True):
                         newstillsynced = False
                         break
             # recurse
-            topdownparallel(primit, secit, visitvertex, newstillsynced)
+            topdownparalleltraversal(primit, secit, visitvertex, newstillsynced)
             # Move secondary iterator back up to original position
             for i in xrange(numgodowns):
                 secit.goUp()

@@ -6,6 +6,9 @@ Sequence types
 
     import seqan
 
+
+.. _simple-types:
+
 Simple types
 ------------
 
@@ -35,6 +38,8 @@ The DNA and RNA types have versions that can represent ambiguous characters.
     >>> print seqan.RNA5('N')
     N
 
+
+.. _strings:
 
 Strings
 -------
@@ -70,6 +75,8 @@ A StringSet is a container of strings.
     >>> print seqs[2]
     GGGG
 
+
+.. _seq-io:
 
 Input/output
 ------------
