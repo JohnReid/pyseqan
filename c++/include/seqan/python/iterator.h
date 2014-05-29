@@ -243,13 +243,25 @@ struct iterator_exposer
     static
     void
     go_previous( exposed_type & it ) {
-        return goPrevious( it );
+        goPrevious( it );
     }
 
     static
     void
     go_next( exposed_type & it ) {
-        return goNext( it );
+        goNext( it );
+    }
+
+    static
+    void
+    go_begin( exposed_type & it ) {
+        goBegin( it );
+    }
+
+    static
+    void
+    go_end( exposed_type & it ) {
+        goEnd( it );
     }
 
     static
@@ -326,6 +338,8 @@ struct iterator_exposer
         _class.def( "goUp", go_up, "Iterates up one edge to the parent in a tree." );
         _class.def( "goPrevious", go_previous, "Iterates to previous position." );
         _class.def( "goNext", go_next, "Iterates to next position." );
+        _class.def( "goBegin", go_begin, "Iterates to first position." );
+        //_class.def( "goEnd", go_end, "Iterates to last position." );
         //_class.def( "__iter__", iter, "Iterator's iterable method.", py::return_internal_reference<>() );
         //_class.def( "__next__", next, "Iterator's next method.", py::return_internal_reference<>() );
         //_class.def( "next", next, "Iterator's next method.", py::return_internal_reference<>() );

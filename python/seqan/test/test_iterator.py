@@ -171,6 +171,18 @@ def _test_iterator_speed():
             assert descender.n == 9766, descender.n
         end = time.time()
         return (end-start)/numdescents
+    def timegonext():
+        start = time.time()
+        for i in xrange(numdescents):
+            it = index.topdownhistory()
+            it.goBegin()
+            n = 0
+            while not it.atEnd:
+                n += it.numOccurrences
+                it.goNext()
+            assert n == 9766, n
+        end = time.time()
+        return (end-start)/numdescents
     for index in _build_index():
         for history in (True, False):
             t = timeit(DescenderTest.descend, history)
@@ -178,6 +190,8 @@ def _test_iterator_speed():
             if history:
                 t = timeit(DescenderTest.descendhistory, True)
                 logging.info('%.4fs with descendhistory() for %s', t, index)
+                t = timegonext()
+                logging.info('%.4fs with goNext()         for %s', t, index)
 
 
 
