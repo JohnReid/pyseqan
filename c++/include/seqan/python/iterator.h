@@ -229,6 +229,47 @@ struct iterator_exposer
     }
 
     static
+    bool
+    at_end( exposed_type & it ) {
+        return atEnd( it );
+    }
+
+    static
+    bool
+    at_begin( exposed_type & it ) {
+        return atBegin( it );
+    }
+
+    static
+    void
+    go_previous( exposed_type & it ) {
+        return goPrevious( it );
+    }
+
+    static
+    void
+    go_next( exposed_type & it ) {
+        return goNext( it );
+    }
+
+    static
+    exposed_type &
+    iter( exposed_type & it ) {
+        return it;
+    }
+
+    static
+    exposed_type &
+    next( exposed_type & it ) {
+        if( atEnd( it ) ) {
+            PyErr_SetString( PyExc_StopIteration, "Finished iterating" );
+            throw boost::python::error_already_set();
+        }
+        goNext( it );
+        return it;
+    }
+
+    static
     exposed_type
     __copy__( exposed_type it ) {
         return it;
@@ -283,6 +324,12 @@ struct iterator_exposer
     expose_history_methods( Class & _class, True && ) {
         _class.def( "copy", __copy__, "Returns a copy of this iterator." );
         _class.def( "goUp", go_up, "Iterates up one edge to the parent in a tree." );
+        _class.def( "goPrevious", go_previous, "Iterates to previous position." );
+        _class.def( "goNext", go_next, "Iterates to next position." );
+        //_class.def( "__iter__", iter, "Iterator's iterable method.", py::return_internal_reference<>() );
+        //_class.def( "__next__", next, "Iterator's next method.", py::return_internal_reference<>() );
+        //_class.def( "next", next, "Iterator's next method.", py::return_internal_reference<>() );
+        _class.add_property( "atEnd", at_end, "Whether the iterator is at the end position." );
         _class.add_property( "nodeUp", node_up, "The vertex descriptor of the parent node." );
     }
 

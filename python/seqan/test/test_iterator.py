@@ -246,6 +246,17 @@ def test_get_occurrences():
             _test_get_occurrences(index, Iterator)
 
 
+def _test_iterable():
+    """Test if iterator is iterable"""
+    logging.info(sys._getframe().f_code.co_name)
+    seqs = _make_test_string_set()
+    for Index in Indexes:
+        index = Index(seqs)
+        for i in index:
+            logging.info(i.representative)
+        1/0
+
+
 def test_by_value_init():
     """Test by-value initialisation"""
     logging.info(sys._getframe().f_code.co_name)

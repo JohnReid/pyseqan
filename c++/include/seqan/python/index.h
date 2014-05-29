@@ -295,6 +295,18 @@ struct exposer< Index< TText, TSpec > > {
         return top_down_history_it( index );
     }
 
+
+    /**
+     * A top down history iterator for the index.
+     */
+    static
+    top_down_history_it
+    iter( exposed_type & index ) {
+        auto result = top_down_history_it( index );
+        goBegin( result );
+        return result;
+    }
+
     /**
      * Save the index.
      */
@@ -339,8 +351,8 @@ struct exposer< Index< TText, TSpec > > {
         _class.def( "save", save, "Save the index." );
         _class.def( "load", load, "Load the index." );
         _class.staticmethod( "load" );
-        _class.def( "topdown", topdown, "A top down iterator for the index." );
-        _class.def( "topdownhistory", topdownhistory, "A top down history iterator for the index." );
+        _class.def( "topdown", topdown, py::with_custodian_and_ward_postcall< 0, 1 >(), "A top down iterator for the index." );
+        _class.def( "topdownhistory", topdownhistory, py::with_custodian_and_ward_postcall< 0, 1 >(), "A top down history iterator for the index." );
         _class.def( "__len__", __len__, "The length of the index." );
         _class.add_property( "text", py::make_function( text, py::return_internal_reference<>() ), "The text of the index." );
 
