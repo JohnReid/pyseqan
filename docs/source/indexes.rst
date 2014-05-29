@@ -84,7 +84,8 @@ SeqAn also provides a top-down-history iterator that can go up.
 Traversal
 ---------
 
-Top-down iterators can traverse the entire index in a top-down manner using recursion.
+Top-down iterators can traverse the entire index in a top-down manner using recursion. This
+functionality is provided in the :func:`seqan.traverse.topdowncopytraversal` method.
 
 ..  doctest::
 
@@ -115,7 +116,8 @@ Top-down iterators can traverse the entire index in a top-down manner using recu
 
 A similar descent with top-down-history iterators is best done using *goUp()* rather
 than *copy()*. In fact this method seems to be slightly more efficient than using *copy()*
-with top-down iterators.
+with top-down iterators. It is provided by the :func:`seqan.traverse.topdownhistorytraversal`
+method.
 
 ..  doctest::
 
@@ -148,7 +150,7 @@ with top-down iterators.
 
 Top-down-history iterators also provide *goBegin()* and *goNext()* methods that allow
 the following depth-first method of traversal. This seems to be the most efficient
-traversal method.
+traversal method. It is provided by the :func:`seqan.traverse.depthfirsttraversal` method.
 
 ..  doctest::
 
@@ -175,13 +177,15 @@ traversal method.
     Index has 14 occurrence(s) of representative ""
 
 
+.. _lazy-initialisation:
+
 Lazy initialisation
 -------------------
 
 Many of the seqan data structures are initialised lazily, that is they are not
 constructed until they are first required. Sometimes you might want to ensure
 the structures are initialised before saving or some other operation. This can
-be achieved via the *traverse()* function.
+be achieved via a traversal function, for example:
 
 ..  doctest::
 

@@ -30,7 +30,7 @@ def suffixpredicate(suffix):
 
 def topdowncopytraversal(it, visitvertex):
     """Visit the vertexes beneath the iterator in a top-down manner.
-    visitvertex(it) is called for each vertex. If this method
+    visitvertex(it) is called for each vertex and if it
     returns False, the top-down descent is truncated. Note
     this method copies the iterator once per vertex, so it is
     suitable for top-down iterators but not top-down-history
@@ -45,7 +45,7 @@ def topdowncopytraversal(it, visitvertex):
 
 def topdownhistorytraversal(it, visitvertex):
     """Visit the vertexes beneath the iterator in a top-down manner.
-    visitvertex(it) is called for each vertex. If this method
+    visitvertex(it) is called for each vertex and if it
     returns False, the top-down descent is truncated. Note
     this method uses *it.goUp()*, so it is
     suitable for top-down-history iterators but not top-down

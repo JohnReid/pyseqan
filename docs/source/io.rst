@@ -27,9 +27,9 @@ the index to disk.
     >>> index.save('my-index')
 
 This will create several (typically many) files with names such as `my-index.bwt`,
-`my-index.child`, etc... One thing to note is that the seqan data structures
-are often only initialised on first use so it can be worth traversing the
-entire index before saving, otherwise the index can be saved in an
+`my-index.child`, etc... One thing to note is that seqan data structures
+can be :ref:`lazily initialised <lazy-initialisation>` so it can be worth traversing the
+entire index before saving, otherwise the index may be saved in an
 uninitialised state. Indexes can be restored from disk using the *load()* method.
 
 ..  doctest::
