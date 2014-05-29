@@ -42,6 +42,13 @@ class Descender(object):
                 it.goUp()
 
 
+def traverse(it):
+    """Top-down traversal of all vertexes beneath this iterator."""
+    descender = Descender()
+    descender.visitvertex = lambda it: True
+    descender.descend(it)
+
+
 class ParallelDescender(object):
     """Descends two indexes (primary and secondary) in parallel. Each vertex in
     the primary is visited and the corresponding vertices (or closest vertices)

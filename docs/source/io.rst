@@ -4,23 +4,52 @@ Input/Output
 
 .. testsetup:: *
 
-   import seqan
+   import seqan.descend
    import seqan.io.graphtool
    import graph_tool.draw
 
-The graph-tool package
-----------------------
+
+
+Saving and loading
+------------------
+
+Indexes can be saved to disk and loaded back from disk. The *save()* method serialises
+the index to disk.
+
+..  doctest::
+
+    >>> seqs = seqan.StringDNASet(('ACGT', 'AAAA', 'GGGG', 'AC'))
+    >>> index = seqan.IndexStringDNASetESA(seqs)
+    >>> seqan.descend.traverse(index.topdown())
+    >>> index.save('my-index')
+
+This will create several (many) files with names such as `my-index.bwt`,
+`my-index.child`, etc... One thing to note is that the seqan data structures
+are often only initialised on first use so it can be worth traversing the
+entire index before saving, otherwise the index can be saved in an
+uninitialised state.
+
+Indexes can be restored from disk.
+
+..  doctest::
+
+    >>> index2 = seqan.IndexStringDNASetESA.load('my-index')
+    >>> it = index2.topdown()
+    >>> it.goDown('AC')
+    >>> print 'Index has {0} occurrence(s) of representative "{1}"'.format(
+    ...     it.numOccurrences, it.representative)
+    Index has 2 occurrence(s) of representative "AC"
+
+
+
+Diagrams
+--------
 
 If you have the graph-tool_ package installed, you can use it to create graphs
 that represent suffix trees or arrays. The graphs can be saved to various
 output formats or examined interactively. For example, suppose we have an index
 
 .. _graph-tool: http://graph-tool.skewed.de/
-
-..  doctest::
-
-    >>> seqs = seqan.StringDNASet(('ACGT', 'AAAA', 'GGGG', 'AC'))
-    >>> index = seqan.IndexStringDNASetESA(seqs)
 
 We can build a graphtool graph from the index
 
