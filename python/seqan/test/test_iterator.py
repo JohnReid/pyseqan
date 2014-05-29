@@ -178,7 +178,7 @@ def _test_iterator_speed():
             it.goBegin()
             n = 0
             while not it.atEnd:
-                n += it.numOccurrences
+                n += 1
                 it.goNext()
             assert n == 9766, n
         end = time.time()
