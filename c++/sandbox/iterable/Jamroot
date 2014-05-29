@@ -1,0 +1,20 @@
+use-project /boost : $(BOOST_ROOT) ;
+
+project
+    : requirements
+        <include>$(SEQAN_ROOT)
+        <variant>release:<define>SEQAN_ENABLE_DEBUG=0
+        <variant>release:<define>SEQAN_ENABLE_TESTING=0
+        <variant>release:<define>NDEBUG
+    : default-build release
+    ;
+
+exe test
+    :
+        test.cpp
+        /boost/timer//boost_timer
+        /site-config//seqan
+        /site-config//rt
+        ;
+
+
