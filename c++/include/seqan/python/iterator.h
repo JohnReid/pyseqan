@@ -130,13 +130,11 @@ struct iterator_exposer
         return repLength( it );
     }
 
-
     static
     infix_t
     get_representative( exposed_type it ) {
         return representative( it );
     }
-
 
     static
     size_t
@@ -145,6 +143,15 @@ struct iterator_exposer
             throw std::invalid_argument( "The root of the index has no parent edge." );
         }
         return parentEdgeLength( it );
+    }
+
+    static
+    alphabet_t
+    parent_edge_first_char( exposed_type it ) {
+        if( isRoot( it ) ) {
+            throw std::invalid_argument( "The root of the index has no parent edge." );
+        }
+        return parentEdgeFirstChar( it );
     }
 
     static
@@ -361,6 +368,10 @@ struct iterator_exposer
                 "Construct the iterator from the index."
             )[ py::with_custodian_and_ward< 1, 2 >() ]
         );
+        _class.add_property(
+                "parentEdgeFirstChar",
+                parent_edge_first_char,
+                "The first character of the edge from the iterator node to its parent." );
         _class.add_property(
                 "parentEdgeLabel",
                 parent_edge_label,

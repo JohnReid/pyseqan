@@ -180,8 +180,9 @@ be achieved via the *traverse()* function.
 
 ..  doctest::
 
-    >>> import seqan.descend
-    >>> seqan.descend.traverse(index.topdown())
+    >>> import seqan.traverse
+    >>> seqan.traverse.depthfirsttraversal(index, lambda it: True)
+    <...>
 
 
 

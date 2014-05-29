@@ -1,5 +1,5 @@
 #
-# Copyright John Reid 2013
+# Copyright John Reid 2013, 2014
 #
 
 """
@@ -10,18 +10,20 @@ import logging
 logger = logging.getLogger(__name__)
 
 import graph_tool.all as GT
-import seqan
+import seqan.traverse
 from copy import copy
 
 
 
-class Builder(seqan.Descender):
+class Builder(object):
     """Build a graphtool graph.
     """
 
     def __init__(self, index, predicate=None):
         "Construct the builder."
-        super(Builder, self).__init__(predicate)
+        if predicate is None:
+            predicate = lambda it: True
+        self.predicate = predicate
         self.index = index
         self.graph = GT.Graph(directed=True)
         self.occurrences = self.graph.new_vertex_property('int')
@@ -29,7 +31,7 @@ class Builder(seqan.Descender):
         self.edge_lengths = self.graph.new_edge_property('int')
         self.vertices = dict()
         self.index_iterators = dict()
-        self(index)
+        seqan.traverse.topdownhistorytraversal(index.topdownhistory(), self.visitvertex)
 
 
     def get_vertex(self, index_it):
@@ -41,9 +43,12 @@ class Builder(seqan.Descender):
         return result
 
 
-    def _add_edge(self, parent, child):
-        if parent is not None:
-            parent_vertex = self.get_vertex(parent)
+    def _add_parent_edge(self, child):
+        if not child.isRoot:
+            firstchar = child.parentEdgeFirstChar
+            child.goUp()
+            parent_vertex = self.get_vertex(child)
+            child.goDown(firstchar)
             child_vertex  = self.get_vertex(child)
             edge = self.graph.add_edge(parent_vertex, child_vertex)
             self.labels[edge] = child.representative[-child.parentEdgeLength:]
@@ -62,15 +67,18 @@ class Builder(seqan.Descender):
         return property_map
 
 
-    def _visit_node(self, parent, child):
+    def visitvertex(self, it):
         """Descend the index adding edges."""
-        self._add_edge(parent, child)
+        if not self.predicate(it):
+            return False
+        self._add_parent_edge(it)
+        return True
 
 
 def edges_in_suffix(builder, suffix):
     """Iterate over the edges in the graph and yield (edge, insuffix).
     """
-    predicate = seqan.suffixpredicate(suffix)
+    predicate = seqan.traverse.suffixpredicate(suffix)
     for edge in builder.graph.edges():
         index_it = builder.index_iterators[edge.target()]
         yield edge, predicate(index_it)

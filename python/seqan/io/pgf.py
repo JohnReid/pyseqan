@@ -1,5 +1,5 @@
 #
-# Copyright John Reid 2013
+# Copyright John Reid 2013, 2014
 #
 
 """
@@ -7,15 +7,16 @@ Write a suffix tree as PGF.
 
 We're looking for something like::
 
-    \tikz [
-        font=\footnotesize,
+    \\tikz [
+        font=\\footnotesize,
         grow=right, level 1/.style={sibling distance=6em},
         level 2/.style={sibling distance=1em}, level distance=5cm
     ]
-    \node {Computational Complexity} % root
+    \\node {Computational Complexity} % root
     child { node {Computational Problems} }
     child { node {Problem Measures} }
     child { node {Problem Aspects} }
+
 """
 
 import logging
@@ -31,6 +32,7 @@ def _pgf_write_descend(tikz, i, highlightsuffix, maxdepth, only_highlight):
         - i: iterator for current node
         - highlightsuffix: suffix to highlight if not None
         - maxdepth: don't go deeper
+
     """
     if maxdepth and maxdepth < len(i.representative):
         return

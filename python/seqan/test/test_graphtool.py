@@ -1,5 +1,5 @@
 #
-# Copyright John Reid 2013
+# Copyright John Reid 2013, 2014
 #
 
 """Test creating a tree from a suffix tree.
@@ -21,8 +21,8 @@ def test_graphtool():
     #    s.remove('T')
     index = seqan.IndexStringDNASetESA(sequences)
     suffix = 'ACGTATGC'
-    predicate = seqan.suffixpredicate(suffix)
-    #predicate = seqan.depthpredicate(4)
+    predicate = seqan.traverse.suffixpredicate(suffix)
+    #predicate = seqan.traverse.depthpredicate(4)
     builder = seqan.io.graphtool.Builder(index, predicate=predicate)
     #pos = GT.radial_tree_layout(builder.graph, builder.graph.vertex(0))
     pos = GT.sfdp_layout(builder.graph)

@@ -1,5 +1,5 @@
 #
-# Copyright John Reid 2013
+# Copyright John Reid 2013, 2014
 #
 
 """
@@ -7,20 +7,19 @@ Test building an index.
 """
 
 from seqan.test import fasta_file
-import seqan
+import seqan.traverse
 import logging
-from copy import copy
 
-def descend(i):
-    if len(i.representative) < 3:
-        logging.info('%-2s : %5d', i.representative, i.numOccurrences)
-        if i.goDown():
-            while True:
-                descend(copy(i))
-                if not i.goRight():
-                    break
+
+def visitvertex(it):
+    if len(it.representative) >= 3:
+        return False
+    logging.info('%-2s : %5d', it.representative, it.numOccurrences)
+    return True
+
 
 def test_build_index():
     _num_bases, sequences, _ids = seqan.readFastaDNA5(fasta_file('dm01r.fasta'))
     index = seqan.IndexStringDNA5SetESA(sequences)
-    descend(index.TopDownIterator(index))
+    seqan.traverse.topdownhistorytraversal(index.topdownhistory(), visitvertex)
+    seqan.traverse.topdowncopytraversal(index.topdown(), visitvertex)

@@ -7,7 +7,7 @@ Test assigning iterator functionality.
 """
 
 from seqan.test import fasta_file
-import seqan
+import seqan.traverse
 import logging
 import sys
 import time
@@ -285,28 +285,6 @@ def test_by_value_init():
     logging.info(j.representative)
 
 
-class TestParallelDescender(seqan.ParallelDescender):
-    def __init__(self, secondaryidx):
-        self.secondaryidx = secondaryidx
-
-    def _visit_node(self, primaryit, secondaryit, stillsynced):
-        logging.debug("%-10s : %-10s : %s",
-            primaryit.representative, secondaryit.representative,
-            stillsynced and "    synced" or "not synced")
-        # Descend secondary index from top as far as we can whilst
-        # matching primary representative
-        it = self.secondaryidx.topdown()
-        while it.repLength < primaryit.repLength and \
-                it.goDown(primaryit.representative[it.repLength]):
-            if it.representative[:it.repLength] != primaryit.representative[:it.repLength]:
-                break
-        # Make sure still synced matches reality
-        assert (it.representative[:primaryit.repLength] == primaryit.representative) \
-            == stillsynced
-        if (secondaryit.representative[:primaryit.repLength] == primaryit.representative) \
-            != stillsynced: 1/0
-
-
 
 sequence_sets = (
     ('GGCAAT', 'GGCAAA'),
@@ -321,6 +299,22 @@ sequence_sets = (
 
 
 def test_parallel_descender():
+    def visitvertex(primaryit, secondaryit, stillsynced):
+        logging.debug("%-10s : %-10s : %s",
+            primaryit.representative, secondaryit.representative,
+            stillsynced and "    synced" or "not synced")
+        # Descend secondary index from top as far as we can whilst
+        # matching primary representative
+        it = secondaryindex.topdown()
+        while it.repLength < primaryit.repLength and \
+                it.goDown(primaryit.representative[it.repLength]):
+            if it.representative[:it.repLength] != primaryit.representative[:it.repLength]:
+                break
+        # Make sure still synced matches reality
+        assert (it.representative[:primaryit.repLength] == primaryit.representative) \
+            == stillsynced
+        if (secondaryit.representative[:primaryit.repLength] == primaryit.representative) \
+            != stillsynced: 1/0
     for primaryseqs in sequence_sets:
         for secondaryseqs in sequence_sets:
             for seq in primaryseqs:
@@ -329,8 +323,10 @@ def test_parallel_descender():
                 logging.info('Secondary: %s', seq)
             primaryindex = seqan.IndexStringDNA5SetESA(make_string_set(primaryseqs))
             secondaryindex = seqan.IndexStringDNA5SetESA(make_string_set(secondaryseqs))
-            TestParallelDescender(secondaryindex).descend(
-                primaryindex.topdown(), secondaryindex.topdown())
+            seqan.traverse.topdownparallel(
+                primaryindex.topdown(),
+                secondaryindex.topdown(),
+                visitvertex)
             #if primaryseqs != secondaryseqs: 1/0  # Just for debugging
 
 

@@ -4,7 +4,7 @@ Input/Output
 
 .. testsetup:: *
 
-   import seqan.descend
+   import seqan.traverse
    import seqan.io.graphtool
    import graph_tool.draw
 
@@ -20,22 +20,22 @@ the index to disk.
 
     >>> seqs = seqan.StringDNASet(('ACGT', 'AAAA', 'GGGG', 'AC'))
     >>> index = seqan.IndexStringDNASetESA(seqs)
-    >>> seqan.descend.traverse(index.topdown())
+    >>> seqan.traverse.depthfirsttraversal(index, lambda it: True)
+    <...>
     >>> index.save('my-index')
 
-This will create several (many) files with names such as `my-index.bwt`,
+This will create several (typically many) files with names such as `my-index.bwt`,
 `my-index.child`, etc... One thing to note is that the seqan data structures
 are often only initialised on first use so it can be worth traversing the
 entire index before saving, otherwise the index can be saved in an
-uninitialised state.
-
-Indexes can be restored from disk.
+uninitialised state. Indexes can be restored from disk using the *load()* method.
 
 ..  doctest::
 
     >>> index2 = seqan.IndexStringDNASetESA.load('my-index')
     >>> it = index2.topdown()
     >>> it.goDown('AC')
+    True
     >>> print 'Index has {0} occurrence(s) of representative "{1}"'.format(
     ...     it.numOccurrences, it.representative)
     Index has 2 occurrence(s) of representative "AC"
@@ -88,7 +88,7 @@ A depthpredicate only shows those vertices within a certain distance of the root
 
 ..  doctest::
 
-    >>> builder = seqan.io.graphtool.Builder(index, predicate=seqan.depthpredicate(2))
+    >>> builder = seqan.io.graphtool.Builder(index, predicate=seqan.traverse.depthpredicate(2))
     >>> pos = graph_tool.draw.graph_draw(
     ...     builder.graph,
     ...     pos=graph_tool.draw.sfdp_layout(builder.graph),
@@ -110,7 +110,7 @@ or a suffix predicate only shows those vertices and edges near a given suffix
 ..  doctest::
 
     >>> suffix = 'ACG'
-    >>> builder = seqan.io.graphtool.Builder(index, predicate=seqan.suffixpredicate(suffix))
+    >>> builder = seqan.io.graphtool.Builder(index, predicate=seqan.traverse.suffixpredicate(suffix))
     >>> pos = graph_tool.draw.graph_draw(
     ...     builder.graph,
     ...     pos=graph_tool.draw.sfdp_layout(builder.graph),
